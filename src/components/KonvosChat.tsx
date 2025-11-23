@@ -8,8 +8,7 @@ import {
   MessageList, 
   MessageInput, 
   Thread, 
-  useChatContext,
-  ChannelHeaderProps
+  useChatContext
 } from 'stream-chat-react';
 import { useStreamVideoClient, StreamCall } from '@stream-io/video-react-sdk';
 import { CustomChannelListHeader } from './stream/CustomChannelListHeader';
@@ -20,17 +19,19 @@ import { Video, Phone, MoreVertical, Trash2, Ban, ArrowLeft } from 'lucide-react
 import 'stream-chat-react/dist/css/v2/index.css';
 import './stream/stream-custom.css';
 
-const CustomChannelHeader: React.FC<ChannelHeaderProps> = (props) => {
-  const { client, setActiveChannel } = useChatContext();
+const CustomChannelHeader: React.FC<any> = (props) => {
+  const { client, setActiveChannel, channel: contextChannel } = useChatContext();
   const videoClient = useStreamVideoClient();
   const { setActiveCall } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
 
   const startCall = async (audioOnly: boolean = false) => {
-    const channelToUse = props.channel;
+    const channelToUse = props.channel || contextChannel;
     if (!videoClient || !channelToUse) return;
+    
+    console.log('Starting call, audio only:', audioOnly);
 
-    const members = Object.values(channelToUse.state.members).map(m => m.user_id).filter(id => id !== client.userID);
+    const members = Object.values(channelToUse.state.members).map((m: any) => m.user_id).filter((id: string) => id !== client.userID);
     if (members.length === 0) return;
 
     const callId = Math.random().toString(36).substring(7);
