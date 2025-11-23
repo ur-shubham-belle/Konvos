@@ -16,20 +16,21 @@ import { CustomChannelListHeader } from './stream/CustomChannelListHeader';
 import { UserList } from './stream/UserList';
 import { CallInterface } from './stream/CallInterface';
 import { useAuth } from '../context/AuthContext';
-import { Video, Phone, MoreVertical, Trash2, Ban } from 'lucide-react';
+import { Video, Phone, MoreVertical, Trash2, Ban, ArrowLeft } from 'lucide-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import './stream/stream-custom.css';
 
 const CustomChannelHeader: React.FC<ChannelHeaderProps> = (props) => {
-  const { client } = useChatContext();
+  const { client, setActiveChannel } = useChatContext();
   const videoClient = useStreamVideoClient();
   const { setActiveCall } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
 
   const startCall = async (audioOnly: boolean = false) => {
-    if (!videoClient || !props.channel) return;
+    const channelToUse = props.channel;
+    if (!videoClient || !channelToUse) return;
 
-    const members = Object.values(props.channel.state.members).map(m => m.user_id).filter(id => id !== client.userID);
+    const members = Object.values(channelToUse.state.members).map(m => m.user_id).filter(id => id !== client.userID);
     if (members.length === 0) return;
 
     const callId = Math.random().toString(36).substring(7);
@@ -55,9 +56,20 @@ const CustomChannelHeader: React.FC<ChannelHeaderProps> = (props) => {
   };
 
   return (
-    <div className="str-chat__header-livestream">
-      <ChannelHeader {...props} />
-      <div className="flex items-center gap-2 mr-4">
+    <div className="str-chat__header-livestream flex items-center justify-between px-4 py-2 bg-[#f0f2f5] border-b border-[#e9edef] h-[60px]">
+      <div className="flex items-center overflow-hidden">
+        <button 
+          onClick={() => setActiveChannel(undefined)}
+          className="md:hidden mr-2 p-2 text-gray-600 hover:bg-gray-200 rounded-full"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <div className="flex-1 min-w-0">
+          <ChannelHeader {...props} />
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-2 shrink-0">
         <button 
           className="p-2 hover:bg-gray-100 rounded-full text-gray-600"
           onClick={() => startCall(false)}
@@ -126,7 +138,7 @@ const KonvosChatInner: React.FC = () => {
         </StreamCall>
       )}
 
-      <div className="w-full md:w-[400px] flex flex-col bg-white border-r border-gray-200 h-full">
+      <div className={`w-full md:w-[400px] flex flex-col bg-white border-r border-gray-200 h-full ${channel ? 'hidden md:flex' : 'flex'}`}>
         <CustomChannelListHeader 
           onSearch={setSearchQuery} 
           isSearching={isSearching} 
@@ -144,7 +156,7 @@ const KonvosChatInner: React.FC = () => {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col h-full bg-[#efeae2]">
+      <div className={`flex-1 flex flex-col h-full bg-[#efeae2] ${!channel ? 'hidden md:flex' : 'flex'}`}>
         {!channel ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500 bg-[#f0f2f5]">
             <div className="w-64 h-64 bg-gray-200 rounded-full mb-8 flex items-center justify-center">
@@ -155,10 +167,9 @@ const KonvosChatInner: React.FC = () => {
             <p className="text-sm text-gray-500 mt-2">Use Konvos on up to 4 linked devices and 1 phone.</p>
           </div>
         ) : (
-          <Channel 
-            HeaderComponent={CustomChannelHeader}
-          >
+          <Channel>
             <Window>
+              <CustomChannelHeader />
               <MessageList />
               <MessageInput focus />
             </Window>
