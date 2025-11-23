@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { StreamChat } from 'stream-chat';
-import { StreamVideoClient, StreamVideo } from '@stream-io/video-react-sdk';
+import { StreamVideoClient, StreamVideo, Call } from '@stream-io/video-react-sdk';
 import { STREAM_API_KEY, API_URL } from '../config';
 
 interface User {
@@ -18,6 +18,8 @@ interface AuthContextType {
   client: StreamChat | null;
   videoClient: StreamVideoClient | null;
   isConnecting: boolean;
+  activeCall: Call | undefined;
+  setActiveCall: (call: Call | undefined) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [client, setClient] = useState<StreamChat | null>(null);
   const [videoClient, setVideoClient] = useState<StreamVideoClient | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [activeCall, setActiveCall] = useState<Call | undefined>(undefined);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('konvos_user');
@@ -184,7 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, client, videoClient, isConnecting }}>
+    <AuthContext.Provider value={{ user, login, register, logout, client, videoClient, isConnecting, activeCall, setActiveCall }}>
       {videoClient ? (
         <StreamVideo client={videoClient}>
           {children}
