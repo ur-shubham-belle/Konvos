@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const connectUser = async (userData: User) => {
-    if (!STREAM_API_KEY || STREAM_API_KEY === 'vfdtvg3uh9b3') {
+    if (!STREAM_API_KEY) {
       console.warn('Stream API Key is missing');
       setIsConnecting(false);
       return;
