@@ -34,10 +34,29 @@
     display: none; /* Hide default header in list */
 }
 
+/* Ensure background image covers the whole chat window */
 .str-chat__main-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.str-chat__list {
   background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
   background-repeat: repeat;
   background-color: #efeae2;
+}
+
+/* Target the Message List container specifically */
+.str-chat__ul.str-chat__list {
+    background-color: transparent;
+}
+
+/* Make sure the main chat window has the background */
+.str-chat__channel {
+    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+    background-repeat: repeat;
+    background-color: #efeae2;
 }
 
 .str-chat__message-simple__content--own {
