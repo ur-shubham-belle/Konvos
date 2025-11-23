@@ -111,29 +111,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       } else {
         const err = await res.json();
-        console.error('Login failed:', err);
-        // throw new Error(err.error || 'Login failed');
+        throw new Error(err.error || 'Login failed');
       }
     } catch (e: any) {
       console.warn('Backend login failed:', e.message);
-      // Only throw if it's strictly an auth failure we can't recover from
-      // otherwise fall through to dev mode for resilience in this demo
+      // If it's a network error or 404, maybe fallback? 
+      // But if it's 401 (invalid credentials), we should throw.
       if (e.message === 'Invalid credentials') {
-        alert('Invalid credentials');
-        return; 
+        throw e;
       }
+      // Re-throw other errors to prevent insecure fallback
+      throw e;
     }
 
-    // Fallback for demo/dev mode (insecure)
+    /*
+    // Fallback for demo/dev mode (insecure) - DISABLED
     if (password) {
        console.warn('Using insecure dev mode login. Password ignored.');
-       // alert('Backend connection failed. Logging in with Dev Mode (Insecure).');
+       alert('Backend connection failed. Logging in with Dev Mode (Insecure).');
     }
     
     const userData = { id, name: id, image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}` };
     localStorage.setItem('konvos_user', JSON.stringify(userData));
     setUser(userData);
     await connectUser(userData);
+    */
   };
 
   const register = async (id: string, name: string, password?: string, image?: string) => {
@@ -154,27 +156,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       } else {
         const err = await res.json();
-        console.error('Registration failed:', err);
-        // throw new Error(err.error || 'Registration failed');
+        throw new Error(err.error || 'Registration failed');
       }
     } catch (e: any) {
       console.warn('Backend register failed:', e.message);
       if (e.message === 'User already exists') {
-        alert('User already exists');
-        return;
+        throw e;
       }
+      // Re-throw other errors
+      throw e;
     }
 
-    // Fallback
+    /*
+    // Fallback - DISABLED
     if (password) {
        console.warn('Using insecure dev mode register. Password ignored.');
-       // alert('Backend connection failed. Registering with Dev Mode (Insecure).');
+       alert('Backend connection failed. Registering with Dev Mode (Insecure).');
     }
 
     const userData = { id, name, image };
     localStorage.setItem('konvos_user', JSON.stringify(userData));
     setUser(userData);
     await connectUser(userData);
+    */
   };
 
   const logout = async () => {
