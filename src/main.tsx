@@ -1,0 +1,21 @@
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import "./index.css";
+import App from "./App.tsx";
+
+console.log('main.tsx - Starting Konvos app');
+
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  console.error('Root element not found!');
+} else {
+  console.log('Root element found, rendering app');
+  createRoot(rootElement).render(
+    <StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </StrictMode>
+  );
+}

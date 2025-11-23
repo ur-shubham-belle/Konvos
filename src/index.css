@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50;
+  }
+}
+
+/* Enhanced Color Contrast & Visual Harmony */
+:root {
+  --konvos-primary: #00a884;
+  --konvos-primary-dark: #008069;
+  --konvos-primary-light: #d1f4e8;
+  --konvos-bg-main: #f8f9fa;
+  --konvos-bg-chat: #ffffff;
+  --konvos-text-primary: #111827;
+  --konvos-text-secondary: #6b7280;
+  --konvos-border: #e5e7eb;
+  --konvos-shadow: rgba(0, 0, 0, 0.08);
+}
+
+/* Custom Scrollbar for Webkit browsers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Improved button contrast */
+.str-chat__send-button {
+  background-color: var(--konvos-primary) !important;
+}
+
+.str-chat__send-button:hover {
+  background-color: var(--konvos-primary-dark) !important;
+}
+
+/* Better message bubble contrast */
+.str-chat__message-simple--me .str-chat__message-text-inner {
+  background-color: var(--konvos-primary-light) !important;
+  color: var(--konvos-text-primary) !important;
+}
+
+.str-chat__message-simple:not(.str-chat__message-simple--me) .str-chat__message-text-inner {
+  background-color: #ffffff !important;
+  color: var(--konvos-text-primary) !important;
+  border: 1px solid var(--konvos-border);
+}

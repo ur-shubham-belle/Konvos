@@ -1,0 +1,78 @@
+/* Custom overrides for Stream Chat to match WhatsApp/Konvos theme */
+
+.konvos-theme {
+  --primary-color: #00a884;
+  --bg-color: #efeae2;
+  --message-bubble-own-bg: #d9fdd3;
+  --message-bubble-bg: #ffffff;
+}
+
+/* Hide default Stream header in list if we want full custom control, 
+   but we are wrapping it so it's fine */
+
+.str-chat__channel-list {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.str-chat__channel-preview-messenger--active {
+  background-color: #f0f2f5;
+  border-left: none;
+}
+
+.str-chat__header-livestream {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0f2f5;
+  border-bottom: 1px solid #e9edef;
+  height: 60px;
+  padding: 0 16px;
+}
+
+.str-chat__list .str-chat__header-livestream {
+    display: none; /* Hide default header in list */
+}
+
+.str-chat__main-panel {
+  background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+  background-repeat: repeat;
+  background-color: #efeae2;
+}
+
+.str-chat__message-simple__content--own {
+  background-color: var(--message-bubble-own-bg);
+  border-radius: 7.5px;
+  border-top-right-radius: 0;
+}
+
+.str-chat__message-simple__content--other {
+  background-color: var(--message-bubble-bg);
+  border-radius: 7.5px;
+  border-top-left-radius: 0;
+}
+
+.str-chat__input-flat {
+  background-color: #f0f2f5;
+  padding: 10px;
+}
+
+.str-chat__input-flat-wrapper {
+  background-color: white;
+  border-radius: 8px;
+  border: none;
+}
+
+.str-chat__send-button {
+  color: #54656f;
+}
+
+.str-chat__date-separator-date {
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  color: #54656f;
+  font-size: 12.5px;
+  padding: 5px 12px;
+  border-radius: 7.5px;
+  text-transform: uppercase;
+}
