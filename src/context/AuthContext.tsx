@@ -53,6 +53,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    // Prevent multiple connection attempts
+    if (client?.userID === userData.id) {
+      console.log('User already connected');
+      // Ensure we have video client
+      if (!videoClient) {
+         const vClient = new StreamVideoClient({ 
+            apiKey: STREAM_API_KEY, 
+            user: { id: userData.id, name: userData.name, image: userData.image },
+            token: userData.token || client.token
+          });
+          setVideoClient(vClient);
+      }
+      setIsConnecting(false);
+      return;
+    }
+    
+    // If client exists but different user, disconnect first
+    if (client) {
+      await client.disconnectUser();
+      setClient(null);
+      setVideoClient(null);
+    }
+
     setIsConnecting(true);
     console.log('Connecting user to Stream:', userData.id);
     try {
@@ -61,26 +84,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Use token from backend if available, otherwise dev token
       const token = userData.token || chatClient.devToken(userData.id);
 
-      await chatClient.connectUser(
-        {
-          id: userData.id,
-          name: userData.name,
-          image: userData.image,
-        },
-        token
-      );
+      if (chatClient.userID !== userData.id) {
+        await chatClient.connectUser(
+          {
+            id: userData.id,
+            name: userData.name,
+            image: userData.image,
+          },
+          token
+        );
+      }
       setClient(chatClient);
 
-      const vClient = new StreamVideoClient({ 
-        apiKey: STREAM_API_KEY, 
-        user: {
-          id: userData.id,
-          name: userData.name,
-          image: userData.image,
-        },
-        token: token
-      });
-      setVideoClient(vClient);
+      // Fix for "StreamVideoClient already exists"
+      let vClient = videoClient;
+      
+      if (!vClient) {
+         vClient = new StreamVideoClient({ 
+            apiKey: STREAM_API_KEY, 
+            user: {
+              id: userData.id,
+              name: userData.name,
+              image: userData.image,
+            },
+            token: token
+          });
+          setVideoClient(vClient);
+      }
 
     } catch (error) {
       console.error('Failed to connect user:', error);
