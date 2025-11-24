@@ -13,7 +13,7 @@ import { useStreamVideoClient, StreamCall } from '@stream-io/video-react-sdk';
 import { CustomChannelListHeader } from './stream/CustomChannelListHeader';
 import { UserList } from './stream/UserList';
 import { CallInterface } from './stream/CallInterface';
-import { CustomChannelPreview } from './stream/CustomChannelPreview';
+import { CustomChannelPreview } from './stream/custom-channel-preview';
 import { useAuth } from '../context/AuthContext';
 import { Video, Phone, MoreVertical, Trash2, Ban, ArrowLeft } from 'lucide-react';
 import 'stream-chat-react/dist/css/v2/index.css';
