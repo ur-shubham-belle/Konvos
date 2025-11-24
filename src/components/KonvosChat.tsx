@@ -7,13 +7,13 @@ import {
   ChannelHeader, 
   MessageList, 
   MessageInput, 
-  Thread, 
   useChatContext
 } from 'stream-chat-react';
 import { useStreamVideoClient, StreamCall } from '@stream-io/video-react-sdk';
 import { CustomChannelListHeader } from './stream/CustomChannelListHeader';
 import { UserList } from './stream/UserList';
 import { CallInterface } from './stream/CallInterface';
+import { CustomChannelPreview } from './stream/CustomChannelPreview';
 import { useAuth } from '../context/AuthContext';
 import { Video, Phone, MoreVertical, Trash2, Ban, ArrowLeft } from 'lucide-react';
 import 'stream-chat-react/dist/css/v2/index.css';
@@ -74,7 +74,9 @@ const CustomChannelHeader: React.FC<any> = (props) => {
     if (!channelToUse) return;
     
     // Find the other user
-    const otherMember = Object.values(channelToUse.state.members).find((m: any) => m.user_id !== client.userID);
+    const members = Object.values(channelToUse.state.members);
+    const otherMember: any = members.find((m: any) => m.user_id !== client.userID);
+    
     if (!otherMember || !otherMember.user_id) {
       alert('Cannot identify user to block');
       return;
