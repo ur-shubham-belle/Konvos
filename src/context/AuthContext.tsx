@@ -56,12 +56,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Prevent multiple connection attempts
     if (client?.userID === userData.id) {
       console.log('User already connected');
-      // Ensure we have video client
       if (!videoClient) {
+         // We can rely on client being present here because of the check above
          const vClient = new StreamVideoClient({ 
             apiKey: STREAM_API_KEY, 
             user: { id: userData.id, name: userData.name, image: userData.image },
-            token: userData.token || client.token
+            token: userData.token || client!.devToken(userData.id)
           });
           setVideoClient(vClient);
       }
