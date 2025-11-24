@@ -38,7 +38,13 @@ const CustomChannelHeader: React.FC<any> = (props) => {
     const call = videoClient.call('default', callId);
     
     try {
+      // audio: true is default. video: !audioOnly.
       await call.join({ create: true });
+      
+      if (audioOnly) {
+        await call.camera.disable();
+      }
+
       setActiveCall(call);
       console.log('Call started:', callId);
     } catch (e) {
@@ -47,13 +53,43 @@ const CustomChannelHeader: React.FC<any> = (props) => {
   };
 
   const handleClearChat = async () => {
-    alert('Clear chat requires admin permissions or backend implementation.');
-    setShowMenu(false);
+    const channelToUse = props.channel || contextChannel;
+    if (!channelToUse) return;
+
+    try {
+      // Attempt to truncate. Note: usually requires special permissions or server-side call.
+      // If this fails, we show the alert.
+      // But client-side truncate often works for owners.
+      await channelToUse.truncate();
+      setShowMenu(false);
+    } catch (e: any) {
+      console.error('Clear chat failed', e);
+      alert('Clear chat requires admin permissions or backend implementation.');
+      setShowMenu(false);
+    }
   };
 
   const handleBlockUser = async () => {
-    alert('Block user functionality requires backend implementation for safety.');
-    setShowMenu(false);
+    const channelToUse = props.channel || contextChannel;
+    if (!channelToUse) return;
+    
+    // Find the other user
+    const otherMember = Object.values(channelToUse.state.members).find((m: any) => m.user_id !== client.userID);
+    if (!otherMember || !otherMember.user_id) {
+      alert('Cannot identify user to block');
+      return;
+    }
+
+    try {
+       // Try to mute them as a "block" equivalent client-side
+       await client.muteUser(otherMember.user_id);
+       alert(`User ${otherMember.user?.name || otherMember.user_id} muted.`);
+       setShowMenu(false);
+    } catch (e) {
+       console.error('Block/Mute failed', e);
+       alert('Block user functionality requires backend implementation for safety.');
+       setShowMenu(false);
+    }
   };
 
   return (
@@ -117,9 +153,16 @@ const KonvosChatInner: React.FC = () => {
   const { activeCall } = useAuth();
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
 
-  const filters = { type: 'messaging', members: { $in: [client.userID!] } };
-  const sort = { last_message_at: -1 };
+  // Sort: Pinned first, then by last message
+  const sort: any = { pinned: -1, last_message_at: -1 };
+  
+  const filters: any = { 
+      type: 'messaging', 
+      members: { $in: [client.userID!] },
+      hidden: showArchived 
+  };
 
   const handleUserSelect = async (userId: string) => {
     const newChannel = client.channel('messaging', {
@@ -129,6 +172,24 @@ const KonvosChatInner: React.FC = () => {
     setActiveChannel(newChannel);
     setIsSearching(false);
     setSearchQuery('');
+  };
+  
+  const handleCreateGroup = () => {
+    // For now, this just prompts alert since full group UI is complex for one turn.
+    // Ideally this would toggle a MultiSelectUserList state.
+    const name = prompt('Enter group name:');
+    if (name) {
+       const newChannel = client.channel('messaging', {
+          name: name,
+          members: [client.userID!],
+          image: `https://api.dicebear.com/7.x/initials/svg?seed=${name}`
+       });
+       newChannel.watch().then(() => {
+           setActiveChannel(newChannel);
+           // User can then add members via channel settings (if implemented) or we need multi-select
+           alert('Group created! Add members feature is coming soon. You can invite users if you have their ID.');
+       });
+    }
   };
 
   return (
@@ -144,6 +205,9 @@ const KonvosChatInner: React.FC = () => {
           onSearch={setSearchQuery} 
           isSearching={isSearching} 
           setIsSearching={setIsSearching}
+          onToggleArchived={() => setShowArchived(!showArchived)}
+          showArchived={showArchived}
+          onCreateGroup={handleCreateGroup}
         />
         
         {isSearching ? (
@@ -153,6 +217,7 @@ const KonvosChatInner: React.FC = () => {
             filters={filters} 
             sort={sort} 
             showChannelSearch={false} 
+            Preview={CustomChannelPreview}
           />
         )}
       </div>
@@ -161,7 +226,8 @@ const KonvosChatInner: React.FC = () => {
         {!channel ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500 bg-[#f0f2f5]">
             <div className="w-64 h-64 bg-gray-200 rounded-full mb-8 flex items-center justify-center">
-               <img src="/assets/youware-bg.png" alt="Konvos" className="w-32 opacity-50" />
+              {/* <img src="/assets/youware-bg.png" alt="Konvos" className="w-32 opacity-50" /> */}
+              <div className="text-4xl font-bold text-[#00a884] opacity-50">K</div>
             </div>
             <h2 className="text-3xl font-light text-gray-600 mb-4">Konvos Web</h2>
             <p className="text-sm text-gray-500">Send and receive messages without keeping your phone online.</p>
@@ -174,7 +240,6 @@ const KonvosChatInner: React.FC = () => {
               <MessageList />
               <MessageInput focus />
             </Window>
-            <Thread />
           </Channel>
         )}
       </div>
