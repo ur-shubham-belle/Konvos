@@ -42,9 +42,8 @@
 }
 
 .str-chat__list {
-  background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-  background-repeat: repeat;
-  background-color: #efeae2;
+  /* Sidebar background */
+  background-color: #ffffff; 
 }
 
 /* Target the Message List container specifically */
@@ -54,8 +53,9 @@
 
 /* Make sure the main chat window has the background */
 .str-chat__channel {
-    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+    background-image: linear-gradient(rgba(229, 221, 213, 0.85), rgba(229, 221, 213, 0.85)), url('https://lh3.googleusercontent.com/rd-gg-dl/ABS2GSllaY7Ruec5UoP8lc8UxJNstOe6erRQ8uBXt6JW3mJ6iBjwevz4A9gjjSlINgoUN2tpFkdH8jGu91AWbpVhJxyaHCU8FeC5k8OyJSqbx1cqKHoK9ajj19N4KdAjIyIo0bfgE6LZwihjHOGWmIcD-K1RWsWQuMuy8uAe_pn0-YSMwRSI_9pWWUsaObTS3Cgbo6Ii2eX9uzu-znk5soIYseQqZo9r0UeTzY6lFguIm5tl4MsAqi2Ahnnxs6nJsgg_3sDh91Jfp744PpFSlPK4UonWtZcHae4rhqPGMxz_Hwa_99pVjIUOEzMVWNq_FEFbgQ9aZXj2b5mvWuq_3Osre-xxReR-ulI_eXE-E3qcPf4ky4i2D2n3--VlVRuggBHdFb4gHtR6En4NxFSKbhkxF1I592U27eyT2_GlAz_qUEYrlQzfIsYTXUzj7R-u4j1cjQL0xKCpS3TV5xdCMFZOuCa3u0g1A4FJ-1GM4T0Yta2h9vJcD9Yk3_KVhSiqOwFDFfnznE9QeKvIsSq4fchMZ-pKyMhxb1ErIDrpGsV3WLOa7AQ-aq8bkaWr1NtFmgRCPlcM_5wXCUrj8t-cXCKGMc9UPHUv08K1-yVtB7c-XyRQJlDg5hC0hB5isu70zNUPwca-lesa9x6lXvF7jjuVSd1AMh-qY-NAiRGc1TGvXJ8E5GS-ZoodOJ-YyzLRY6gVJDh5gEsPajMGmmnbvL3YKjl_fKiTBQAPsmU277bcBfeY4t2BiD_byOAjRIIuW4sibyx9o9Gpw2MX8_bOHd9DqYBFfnn2hz-Y_O_dbFZluyF_hZpe27rqIO2M9M71oG0G2mxRdjBssV_dFPka2WIxFK8DtmaSn4FVV0rQVI-1NHYo0KILrPLOxxVSatFjnx57vy5Ntqez9RiUlhKosbFj-lcW2t4jy1pNlRqelk91qXem9bAEnkp_d5bmJzxOB1d8vLUck8rk5_Xz0HHkRi6X6PddLZlIIrTGy57qdYqq5Wvu-3_88YHzOlth8IP8zx55C5msmU-kVet_ST8pyX6AqIZ5iXnkRKcizjwKfZ1zRDoPSBz18k1MVQVIeHvXfYHQakJHlnFv7VHnV1QbyiDUrwzMs0Je3rOdQdyieC8RKOSRDMl8DBD1cem9w3DA8Ip5e92J7t4XtqkX61dw_9CkyzEc9aqZUt8jgsAVZQ9n6vk=s1024-rj');
     background-repeat: repeat;
+    background-size: contain;
     background-color: #efeae2;
 }
 
