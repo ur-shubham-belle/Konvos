@@ -158,13 +158,13 @@ const KonvosChatInner: React.FC = () => {
   const [showArchived, setShowArchived] = useState(false);
 
   // Sort: Pinned first, then by last message
-  const sort: any = { pinned: -1, last_message_at: -1 };
+  const sort: any = React.useMemo(() => ({ pinned: -1, last_message_at: -1 }), []);
   
-  const filters: any = { 
+  const filters: any = React.useMemo(() => ({ 
       type: 'messaging', 
       members: { $in: [client.userID!] },
       hidden: showArchived 
-  };
+  }), [client.userID, showArchived]);
 
   const handleUserSelect = async (userId: string) => {
     const newChannel = client.channel('messaging', {
