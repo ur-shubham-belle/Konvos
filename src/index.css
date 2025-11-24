@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-50;
+    @apply bg-gray-50 font-sans antialiased;
   }
 }
 
@@ -13,12 +13,22 @@
   --konvos-primary: #00a884;
   --konvos-primary-dark: #008069;
   --konvos-primary-light: #d1f4e8;
-  --konvos-bg-main: #f8f9fa;
-  --konvos-bg-chat: #ffffff;
+  --konvos-bg-main: #f0f2f5;
+  --konvos-bg-chat: #efeae2;
   --konvos-text-primary: #111827;
-  --konvos-text-secondary: #6b7280;
-  --konvos-border: #e5e7eb;
+  --konvos-text-secondary: #54656f;
+  --konvos-border: #e9edef;
   --konvos-shadow: rgba(0, 0, 0, 0.08);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
 }
 
 /* Custom Scrollbar for Webkit browsers */
@@ -32,31 +42,35 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 /* Improved button contrast */
 .str-chat__send-button {
-  background-color: var(--konvos-primary) !important;
+  background-color: transparent !important;
+  color: var(--konvos-text-secondary);
 }
 
 .str-chat__send-button:hover {
-  background-color: var(--konvos-primary-dark) !important;
+  background-color: rgba(0,0,0,0.05) !important;
 }
 
 /* Better message bubble contrast */
 .str-chat__message-simple--me .str-chat__message-text-inner {
   background-color: var(--konvos-primary-light) !important;
   color: var(--konvos-text-primary) !important;
+  box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
 }
 
 .str-chat__message-simple:not(.str-chat__message-simple--me) .str-chat__message-text-inner {
   background-color: #ffffff !important;
   color: var(--konvos-text-primary) !important;
-  border: 1px solid var(--konvos-border);
+  box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+  border: none !important;
 }
+
