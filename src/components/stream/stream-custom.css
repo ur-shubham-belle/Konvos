@@ -7,8 +7,33 @@
   --message-bubble-bg: #ffffff;
 }
 
-/* Hide default Stream header in list if we want full custom control, 
-   but we are wrapping it so it's fine */
+/* Animated flowing background for Chat List */
+@keyframes flowingGradientList {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Animated flowing background for Chat Panel */
+@keyframes flowingGradientPanel {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Chat List flowing background - subtle blue-gray gradient */
+.chat-list-flowing-bg {
+  background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #f1f5f9, #e2e8f0);
+  background-size: 400% 400%;
+  animation: flowingGradientList 15s ease infinite;
+}
+
+/* Chat Panel flowing background - warm subtle gradient */
+.chat-panel-flowing-bg {
+  background: linear-gradient(-45deg, #fef3e2, #fce7c8, #fef9e7, #fde4b7);
+  background-size: 400% 400%;
+  animation: flowingGradientPanel 20s ease infinite;
+}
 
 .str-chat__channel-list {
   height: 100%;
@@ -16,7 +41,7 @@
 }
 
 .str-chat__channel-preview-messenger--active {
-  background-color: #f0f2f5;
+  background-color: rgba(0, 168, 132, 0.1);
   border-left: none;
 }
 
@@ -31,10 +56,9 @@
 }
 
 .str-chat__list .str-chat__header-livestream {
-    display: none; /* Hide default header in list */
+  display: none;
 }
 
-/* Ensure background image covers the whole chat window */
 .str-chat__main-panel {
   display: flex;
   flex-direction: column;
@@ -42,22 +66,19 @@
 }
 
 .str-chat__list {
-  /* Sidebar background */
-  background-color: #ffffff; 
+  background-color: transparent;
 }
 
-/* Target the Message List container specifically */
 .str-chat__ul.str-chat__list {
-    background-color: transparent;
+  background-color: transparent;
 }
 
-/* Make sure the main chat window has the background */
 .str-chat__channel {
-    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-    background-repeat: repeat;
-    background-size: 400px; /* Adjust size for the pattern */
-    background-color: #efeae2;
-    height: 100%;
+  background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+  background-repeat: repeat;
+  background-size: 400px;
+  background-color: transparent;
+  height: 100%;
 }
 
 .str-chat__message-simple__content--own {
@@ -95,4 +116,162 @@
   padding: 5px 12px;
   border-radius: 7.5px;
   text-transform: uppercase;
+}
+
+/* Hide thread button on message hover */
+.str-chat__message-actions-box button[aria-label="Thread reply"],
+.str-chat__message-simple__actions button[data-testid*="thread"],
+.str-chat__message-options .str-chat__message-actions-container button:has(svg[data-testid*="thread"]),
+[data-testid="message-options-thread"],
+.str-chat__message-actions-list button:has([data-testid*="thread"]),
+button.str-chat__message-actions-list-item--thread,
+.str-chat__message-simple-thread-button,
+.str-chat__message-options-thread,
+.str-chat__message-team__actions button[aria-label*="Thread"],
+.str-chat__message-team__actions button[aria-label*="thread"],
+.str-chat__message-simple__actions__action--thread {
+  display: none !important;
+}
+
+/* Hide mark as unread button */
+.str-chat__message-actions-box button[aria-label="Mark as unread"],
+.str-chat__message-actions-list button:has(span:contains("Mark as unread")),
+[data-testid="message-options-mark-as-unread"],
+button.str-chat__message-actions-list-item--mark-unread,
+.str-chat__message-actions-list-item[data-testid*="unread"],
+.str-chat__message-simple__actions__action--unread {
+  display: none !important;
+}
+
+/* Hide pin message button */
+.str-chat__message-actions-box button[aria-label="Pin"],
+.str-chat__message-actions-list button:has(span:contains("Pin")),
+[data-testid="message-options-pin"],
+button.str-chat__message-actions-list-item--pin,
+.str-chat__message-actions-list-item[data-testid*="pin"],
+.str-chat__message-simple__actions__action--pin {
+  display: none !important;
+}
+
+/* Emoji picker styling */
+.emoji-picker-container {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  z-index: 100;
+  margin-bottom: 8px;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.emoji-btn {
+  font-size: 20px;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  background: transparent;
+}
+
+.emoji-btn:hover {
+  background-color: #f0f2f5;
+  transform: scale(1.15);
+}
+
+/* Single reaction styling */
+.str-chat__message-reactions-list {
+  display: flex;
+  gap: 4px;
+}
+
+.str-chat__message-reaction-selector {
+  display: flex;
+  gap: 4px;
+}
+
+/* Additional hiding for Stream SDK built-in actions */
+.str-chat__message-actions-list-item--thread,
+.str-chat__message-actions-list-item--pin,
+.str-chat__message-actions-list-item--mark-unread,
+[data-testid="thread-action"],
+[data-testid="pin-action"],
+[data-testid="mark-unread-action"],
+button[title="Reply in thread"],
+button[title="Pin message"],
+button[title="Mark as unread"],
+.str-chat__message-commerce__actions__action--thread,
+.str-chat__message-team__actions__action--thread,
+.str-chat__message-simple-reply-button {
+  display: none !important;
+}
+
+/* Hide message actions we don't want */
+.str-chat__message-actions-list li:has(button[aria-label*="thread"]),
+.str-chat__message-actions-list li:has(button[aria-label*="Thread"]),
+.str-chat__message-actions-list li:has(button[aria-label*="pin"]),
+.str-chat__message-actions-list li:has(button[aria-label*="Pin"]),
+.str-chat__message-actions-list li:has(button[aria-label*="unread"]),
+.str-chat__message-actions-list li:has(button[aria-label*="Unread"]) {
+  display: none !important;
+}
+
+/* Improved message styling */
+.str-chat__message-simple {
+  margin: 4px 0;
+}
+
+.str-chat__message-text-inner {
+  border-radius: 8px;
+}
+
+/* Better input styling */
+.str-chat__message-input {
+  background: transparent;
+}
+
+/* Smooth scrollbar for chat list */
+.str-chat__channel-list::-webkit-scrollbar,
+.str-chat__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.str-chat__channel-list::-webkit-scrollbar-track,
+.str-chat__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.str-chat__channel-list::-webkit-scrollbar-thumb,
+.str-chat__list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.str-chat__channel-list::-webkit-scrollbar-thumb:hover,
+.str-chat__list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Reply message styling */
+.str-chat__quoted-message-preview {
+  background-color: rgba(0, 168, 132, 0.1);
+  border-left: 3px solid #00a884;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 4px;
+}
+
+/* Active channel highlight */
+.str-chat__channel-preview--active {
+  background: linear-gradient(90deg, rgba(0, 168, 132, 0.15), transparent);
 }

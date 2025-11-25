@@ -19,36 +19,33 @@ export const register = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  // Check if user exists
-  db.get('SELECT * FROM users WHERE id = ?', [id], async (err, row) => {
+  const normalizedId = id.toLowerCase().trim();
+
+  db.get('SELECT * FROM users WHERE id = ?', [normalizedId], async (err, row) => {
     if (err) return res.status(500).json({ error: 'Database error' });
     if (row) return res.status(409).json({ error: 'User already exists' });
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    // Insert into DB
     db.run(
       'INSERT INTO users (id, name, password_hash, image) VALUES (?, ?, ?, ?)',
-      [id, name, hash, image || ''],
+      [normalizedId, name, hash, image || ''],
       async function (err) {
         if (err) return res.status(500).json({ error: 'Failed to create user' });
 
         try {
-          // Create user in Stream
           const serverClient = getStreamClient();
           await serverClient.upsertUser({
-            id,
+            id: normalizedId,
             name,
             image,
           });
 
-          // Generate Token
-          const token = serverClient.createToken(id);
+          const token = serverClient.createToken(normalizedId);
 
           return res.json({
-            user: { id, name, image },
+            user: { id: normalizedId, name, image },
             token
           });
         } catch (error: any) {
@@ -67,20 +64,70 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Missing credentials' });
   }
 
-  db.get('SELECT * FROM users WHERE id = ?', [id], async (err, row: any) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    if (!row) return res.status(401).json({ error: 'Invalid credentials' });
+  const normalizedId = id.toLowerCase().trim();
 
-    // Verify password
+  db.get('SELECT * FROM users WHERE id = ?', [normalizedId], async (err, row: any) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    
+    if (!row) {
+      try {
+        const serverClient = getStreamClient();
+        const response = await serverClient.queryUsers({ id: normalizedId });
+        
+        if (response.users && response.users.length > 0) {
+          const streamUser = response.users[0];
+          
+          const salt = await bcrypt.genSalt(10);
+          const hash = await bcrypt.hash(password, salt);
+          
+          return new Promise<void>((resolve) => {
+            db.run(
+              'INSERT INTO users (id, name, password_hash, image) VALUES (?, ?, ?, ?)',
+              [normalizedId, streamUser.name || normalizedId, hash, streamUser.image || ''],
+              function (insertErr) {
+                if (insertErr) {
+                  console.error('Failed to sync user from Stream:', insertErr);
+                  res.status(401).json({ error: 'Invalid credentials' });
+                  resolve();
+                  return;
+                }
+                
+                const token = serverClient.createToken(normalizedId);
+                res.json({
+                  user: { 
+                    id: normalizedId, 
+                    name: streamUser.name || normalizedId, 
+                    image: streamUser.image || '' 
+                  },
+                  token
+                });
+                resolve();
+              }
+            );
+          });
+        }
+      } catch (streamErr) {
+        console.error('Stream query error:', streamErr);
+      }
+      
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
     const valid = await bcrypt.compare(password, row.password_hash);
     if (!valid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     try {
-      // Generate Token
       const serverClient = getStreamClient();
-      const token = serverClient.createToken(id);
+      
+      await serverClient.upsertUser({
+        id: row.id,
+        name: row.name,
+        image: row.image,
+      });
+      
+      const token = serverClient.createToken(row.id);
 
       return res.json({
         user: { id: row.id, name: row.name, image: row.image },
