@@ -52,31 +52,46 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
 };
 
 const CustomMessageInput: React.FC = () => {
-  const { text = '', setText, handleSubmit, uploadFile } = useMessageInputContext();
+  const context = useMessageInputContext();
+  const { text = '', setText, handleSubmit, uploadFile } = context;
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEmojiSelect = (emoji: string) => {
-    setText((text || '') + emoji);
+    const newText = (text || '') + emoji;
+    setText(newText);
     setShowEmojiPicker(false);
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
     if (files && uploadFile) {
-      Array.from(files).forEach(file => uploadFile(file));
+      for (let i = 0; i < files.length; i++) {
+        uploadFile(files[i]);
+      }
     }
-    e.currentTarget.value = '';
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (text?.trim()) {
+      handleSubmit(e);
+    }
   };
 
   return (
-    <div className="str-chat__input-flat custom-input-wrapper">
-      <div className="flex items-center gap-2 w-full">
-        <div className="relative">
+    <div className="str-chat__input-flat custom-message-input">
+      <div className="flex items-center gap-3 w-full px-2 py-2">
+        {/* Emoji Button */}
+        <div className="relative flex-shrink-0">
           <button 
             type="button"
-            className="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors flex-shrink-0"
+            className="p-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            title="Add emoji"
           >
             <Smile size={20} />
           </button>
@@ -87,9 +102,11 @@ const CustomMessageInput: React.FC = () => {
             />
           )}
         </div>
+
+        {/* File Upload */}
         <input
-          type="file"
           ref={fileInputRef}
+          type="file"
           onChange={handleFileSelect}
           className="hidden"
           multiple
@@ -98,27 +115,34 @@ const CustomMessageInput: React.FC = () => {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors flex-shrink-0"
+          className="p-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors flex-shrink-0"
           title="Attach file"
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
           </svg>
         </button>
-        <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
+
+        {/* Message Input Form */}
+        <form onSubmit={onSubmit} className="flex-1 flex items-center gap-2">
           <input
             type="text"
             value={text || ''}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type a message"
-            className="flex-1 py-2.5 px-4 rounded-lg border-none focus:ring-0 focus:outline-none bg-white text-sm"
+            className="flex-1 py-2 px-3 bg-white rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#00a884]/20 focus:border-[#00a884]"
           />
           <button
             type="submit"
-            disabled={!text || !text.trim()}
-            className={`p-2.5 rounded-full transition-all flex-shrink-0 ${(text && text.trim()) ? 'bg-[#00a884] text-white hover:bg-[#008069]' : 'bg-gray-200 text-gray-400'}`}
+            disabled={!text?.trim()}
+            className={`p-2 rounded-full transition-all flex-shrink-0 ${
+              text?.trim() 
+                ? 'bg-[#00a884] text-white hover:bg-[#008069]' 
+                : 'bg-gray-200 text-gray-400'
+            }`}
+            title="Send message"
           >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
             </svg>
           </button>
@@ -333,7 +357,7 @@ const KonvosChatInner: React.FC = () => {
             )}
 
             {/* Chat List with flowing background */}
-            <div className={`w-full md:w-[400px] flex flex-col border-r border-gray-200 h-full chat-list-flowing-bg ${channel ? 'hidden md:flex' : 'flex'}`}>
+            <div className={`hidden md:flex w-[400px] flex-col border-r border-gray-200 h-full chat-list-flowing-bg ${channel ? 'md:flex' : ''}`}>
                 <CustomChannelListHeader
                     onSearch={setSearchQuery}
                     isSearching={isSearching}
@@ -358,7 +382,7 @@ const KonvosChatInner: React.FC = () => {
             </div>
 
             {/* Chat Panel with flowing background */}
-            <div className={`flex-1 flex flex-col h-full chat-panel-flowing-bg ${!channel ? 'hidden md:flex' : 'flex'}`}>
+            <div className={`flex-1 hidden md:flex flex-col h-full chat-panel-flowing-bg ${!channel ? '' : 'flex md:flex'}`}>
                 {!channel ? (
                     <div className="flex flex-col items-center justify-center h-full text-gray-500">
                         <div className="w-64 h-64 bg-white/50 backdrop-blur-sm rounded-full mb-8 flex items-center justify-center shadow-lg">
@@ -374,7 +398,7 @@ const KonvosChatInner: React.FC = () => {
                         reactionOptions={customReactionOptions}
                         key={channel.cid}
                     >
-                        <div className="flex flex-col h-full">
+                        <div className="flex flex-col h-full w-full bg-white">
                             <CustomChannelHeader channel={channel} />
                             <MessageList
                                 messageActions={['react', 'reply', 'delete', 'edit']}
