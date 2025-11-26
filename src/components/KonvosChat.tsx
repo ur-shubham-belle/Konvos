@@ -288,26 +288,35 @@ const KonvosChatInner: React.FC = () => {
   }), [client.userID, showArchived]);
 
   const handleUserSelect = async (userId: string) => {
-    const newChannel = client.channel('messaging', {
-      members: [client.userID!, userId],
-    });
-    await newChannel.watch();
-    setActiveChannel(newChannel);
-    setIsSearching(false);
-    setSearchQuery('');
+    try {
+      const newChannel = client.channel('messaging', {
+        members: [client.userID!, userId],
+      });
+      await newChannel.create();
+      await newChannel.watch();
+      setActiveChannel(newChannel);
+      setIsSearching(false);
+      setSearchQuery('');
+    } catch (error) {
+      console.error('Failed to create or select channel:', error);
+    }
   };
   
-  const handleCreateGroup = () => {
+  const handleCreateGroup = async () => {
     const name = prompt('Enter group name:');
     if (name) {
-       const newChannel = client.channel('messaging', {
+      try {
+        const newChannel = client.channel('messaging', {
           name: name,
           members: [client.userID!],
           image: `https://api.dicebear.com/7.x/initials/svg?seed=${name}`
-       });
-       newChannel.watch().then(() => {
-           setActiveChannel(newChannel);
-       });
+        });
+        await newChannel.create();
+        await newChannel.watch();
+        setActiveChannel(newChannel);
+      } catch (error) {
+        console.error('Failed to create group:', error);
+      }
     }
   };
 
