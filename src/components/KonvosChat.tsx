@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Chat, 
-  Channel, 
-  ChannelList, 
-  Window, 
-  ChannelHeader, 
-  MessageList,
-  useChatContext,
-  useMessageInputContext
+import {
+    Chat,
+    Channel,
+    ChannelList,
+    Window,
+    ChannelHeader,
+    MessageList,
+    useChatContext,
+    useMessageInputContext
 } from 'stream-chat-react';
 import { useStreamVideoClient, StreamCall } from '@stream-io/video-react-sdk';
 import { CustomChannelListHeader } from './stream/CustomChannelListHeader';
@@ -15,7 +15,7 @@ import { UserList } from './stream/UserList';
 import { CallInterface } from './stream/CallInterface';
 import { CustomChannelPreview } from './stream/custom-channel-preview';
 import { useAuth } from '../context/AuthContext';
-import { Video, Phone, MoreVertical, Trash2, Ban, ArrowLeft, UserCheck, Smile } from 'lucide-react';
+import { Video, Phone, MoreVertical, Trash2, ArrowLeft, Smile } from 'lucide-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import './stream/stream-custom.css';
 
@@ -52,9 +52,9 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
 };
 
 const CustomMessageInput: React.FC = () => {
-  const { text = '', setText, handleSubmit, uploadFile } = useMessageInputContext();
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+    const { text = '', setText, handleSubmit, uploadFile } = useMessageInputContext();
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleEmojiSelect = (emoji: string) => {
         setText((text || '') + emoji);
@@ -183,42 +183,9 @@ const CustomChannelHeader: React.FC<any> = (props) => {
         }
     };
 
-    const getOtherMember = () => {
-        const channelToUse = props.channel || contextChannel;
-        if (!channelToUse) return null;
-        const members = Object.values(channelToUse.state.members);
-        return members.find((m: any) => m.user_id !== client.userID) as any;
-    };
 
-    const handleBlockUser = async () => {
-        const otherMember = getOtherMember();
-        if (!otherMember?.user_id || actionLoading) return;
 
-        setActionLoading(true);
-        try {
-            await client.banUser(otherMember.user_id);
-        } catch (e) {
-            console.error('Block error (may still succeed):', e);
-        } finally {
-            setActionLoading(false);
-            setShowMenu(false);
-        }
-    };
 
-    const handleUnblockUser = async () => {
-        const otherMember = getOtherMember();
-        if (!otherMember?.user_id || actionLoading) return;
-
-        setActionLoading(true);
-        try {
-            await client.unbanUser(otherMember.user_id);
-        } catch (e) {
-            console.error('Unblock error (may still succeed):', e);
-        } finally {
-            setActionLoading(false);
-            setShowMenu(false);
-        }
-    };
 
     return (
         <div className="str-chat__header-livestream flex items-center justify-between px-4 py-2 bg-[#f0f2f5] border-b border-[#e9edef] h-[60px]">
@@ -265,23 +232,6 @@ const CustomChannelHeader: React.FC<any> = (props) => {
                             >
                                 <Trash2 size={16} /> Clear Chat
                             </button>
-                            {!contextChannel?.data?.hidden ? (
-                                <button
-                                    onClick={handleBlockUser}
-                                    disabled={actionLoading}
-                                    className="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-red-600 disabled:opacity-50 transition-colors"
-                                >
-                                    <Ban size={16} /> Block User
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleUnblockUser}
-                                    disabled={actionLoading}
-                                    className="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-green-600 disabled:opacity-50 transition-colors"
-                                >
-                                    <UserCheck size={16} /> Unblock User
-                                </button>
-                            )}
                         </div>
                     )}
                 </div>
@@ -305,13 +255,15 @@ const KonvosChatInner: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showArchived, setShowArchived] = useState(false);
 
-    // Sort: Pinned first, then by last message
+    // Sort: by last message
     const sort: any = React.useMemo(() => ([{ last_message_at: -1 }]), []);
 
+    // Only show channels with messages (recent conversations)
     const filters: any = React.useMemo(() => ({
         type: 'messaging',
         members: { $in: [client.userID!] },
-        hidden: showArchived
+        hidden: showArchived,
+        last_message_at: { $exists: true }
     }), [client.userID, showArchived]);
 
     const handleUserSelect = async (userId: string) => {
@@ -356,13 +308,17 @@ const KonvosChatInner: React.FC = () => {
                 const newChannel = client.channel('messaging', {
                     name: name,
                     members: [client.userID!],
-                    image: `https://api.dicebear.com/7.x/initials/svg?seed=${name}`
+                    image: `https://api.dicebear.com/7.x/avatars/svg?seed=${encodeURIComponent(name)}`
                 });
                 await newChannel.create();
                 await newChannel.watch();
                 setActiveChannel(newChannel);
+
+                // Show message about adding members
+                alert(`Group "${name}" created! Add members by typing their username in the search bar and starting a conversation with them in the group.`);
             } catch (error) {
                 console.error('Failed to create group:', error);
+                alert('Failed to create group. Please try again.');
             }
         }
     };
@@ -410,18 +366,20 @@ const KonvosChatInner: React.FC = () => {
                         <p className="text-sm text-gray-500 mt-2">Use Konvos on up to 4 linked devices and 1 phone.</p>
                     </div>
                 ) : (
-                    <Channel 
-                      Input={CustomMessageInput}
-                      reactionOptions={customReactionOptions}
-                      key={channel.cid}
+                    <Channel
+                        Input={CustomMessageInput}
+                        reactionOptions={customReactionOptions}
+                        key={channel.cid}
+                        messages={channel.state.messages}
                     >
-                      <Window>
-                        <CustomChannelHeader channel={channel} />
-                        <MessageList 
-                          messageActions={['react', 'reply', 'delete', 'edit']}
-                          noGroupByUser={false}
-                        />
-                      </Window>
+                        <Window>
+                            <CustomChannelHeader channel={channel} />
+                            <MessageList
+                                messageActions={['react', 'reply', 'delete', 'edit']}
+                                noGroupByUser={false}
+                            />
+                            <CustomMessageInput />
+                        </Window>
                     </Channel>
                 )}
             </div>
