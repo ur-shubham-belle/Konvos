@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChatContext } from 'stream-chat-react';
-import { Search, X, MoreVertical, LogOut, Archive, Users } from 'lucide-react';
+import { Search, X, MoreVertical, LogOut, Archive, Users, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Avatar } from '../common/Avatar';
 
@@ -11,6 +11,8 @@ interface CustomChannelListHeaderProps {
   onToggleArchived?: () => void;
   showArchived?: boolean;
   onCreateGroup?: () => void;
+  onToggleTheme?: () => void;
+  isDarkMode?: boolean;
 }
 
 export const CustomChannelListHeader: React.FC<CustomChannelListHeaderProps> = ({ 
@@ -19,7 +21,9 @@ export const CustomChannelListHeader: React.FC<CustomChannelListHeaderProps> = (
   setIsSearching,
   onToggleArchived,
   showArchived,
-  onCreateGroup
+  onCreateGroup,
+  onToggleTheme,
+  isDarkMode
 }) => {
   const { client } = useChatContext();
   const { user, logout } = useAuth();
@@ -75,6 +79,15 @@ export const CustomChannelListHeader: React.FC<CustomChannelListHeaderProps> = (
               title="Create group"
             >
               <Users size={20} />
+            </button>
+          )}
+          {onToggleTheme && (
+            <button 
+              className="p-2 hover:bg-white/60 rounded-full transition-colors"
+              onClick={onToggleTheme}
+              title={isDarkMode ? 'Light mode' : 'Dark mode'}
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
           )}
           <div className="relative" ref={menuRef}>

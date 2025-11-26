@@ -122,10 +122,7 @@
 }
 
 .str-chat__channel {
-  background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-  background-repeat: repeat;
-  background-size: 400px;
-  background-color: transparent;
+  background: none !important;
   height: 100%;
   width: 100%;
   position: relative;
@@ -164,12 +161,22 @@
   border-top-left-radius: 0;
 }
 
-.str-chat__input-flat {
+.str-chat__input-flat,
+.custom-input-wrapper {
   background-color: #f0f2f5 !important;
-  padding: 10px !important;
+  padding: 12px !important;
   position: relative !important;
   z-index: 10 !important;
   display: flex !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 65px !important;
+  flex-shrink: 0 !important;
+}
+
+.dark .str-chat__input-flat,
+.dark .custom-input-wrapper {
+  background-color: #2a2a2a !important;
 }
 
 .str-chat__input-flat-wrapper {
@@ -349,4 +356,64 @@ button[title="Mark as unread"],
 /* Active channel highlight */
 .str-chat__channel-preview--active {
   background: linear-gradient(90deg, rgba(0, 168, 132, 0.15), transparent);
+}
+
+/* Dark mode styles */
+.dark .str-chat__list {
+  background-color: #1a1a1a !important;
+}
+
+.dark .str-chat__channel-list {
+  background-color: #1a1a1a !important;
+}
+
+.dark .str-chat__channel-preview-messenger {
+  color: #e0e0e0;
+}
+
+.dark .str-chat__channel-preview-messenger:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark .str-chat__message-simple__content--own {
+  background-color: #00a884;
+  color: white;
+}
+
+.dark .str-chat__message-simple__content--other {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.dark .str-chat__message-text-inner {
+  color: inherit;
+}
+
+.dark .str-chat__input-flat input::placeholder {
+  color: #888;
+}
+
+.dark .str-chat__input-flat input,
+.dark input[type="text"] {
+  background-color: #333 !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #444 !important;
+}
+
+.dark .str-chat__input-flat button {
+  color: #888 !important;
+}
+
+.dark .str-chat__input-flat button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ensure input takes proper width */
+form {
+  width: 100%;
+  display: flex;
+}
+
+form input[type="text"] {
+  width: 100%;
 }

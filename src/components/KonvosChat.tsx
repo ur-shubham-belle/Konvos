@@ -52,79 +52,102 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
 };
 
 const CustomMessageInput: React.FC = () => {
-    const { text = '', setText, handleSubmit, uploadFile } = useMessageInputContext();
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+  const { text = '', setText, handleSubmit: contextHandleSubmit, uploadFile } = useMessageInputContext();
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleEmojiSelect = (emoji: string) => {
-        setText((text || '') + emoji);
-        setShowEmojiPicker(false);
-    };
+  const handleEmojiSelect = (emoji: string) => {
+    const newText = (text || '') + emoji;
+    setText(newText);
+    setShowEmojiPicker(false);
+    inputRef.current?.focus();
+  };
 
-    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.currentTarget.files;
-        if (files && uploadFile) {
-            Array.from(files).forEach(file => uploadFile(file));
-        }
-    };
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.currentTarget.files;
+    if (files && uploadFile) {
+      Array.from(files).forEach(file => uploadFile(file));
+    }
+    e.currentTarget.value = '';
+  };
 
-    return (
-        <div className="str-chat__input-flat bg-[#f0f2f5] px-4 py-3">
-            <div className="flex items-center gap-2">
-                <div className="relative">
-                    <button
-                        type="button"
-                        className="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors"
-                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    >
-                        <Smile size={24} />
-                    </button>
-                    {showEmojiPicker && (
-                        <EmojiPicker
-                            onSelect={handleEmojiSelect}
-                            onClose={() => setShowEmojiPicker(false)}
-                        />
-                    )}
-                </div>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    multiple
-                    accept="image/*,.pdf,.doc,.docx"
-                />
-                <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors"
-                    title="Attach file"
-                >
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                    </svg>
-                </button>
-                <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
-                    <input
-                        type="text"
-                        value={text || ''}
-                        onChange={(e) => setText(e.target.value)}
-                        placeholder="Type a message"
-                        className="flex-1 py-2.5 px-4 rounded-lg border-none focus:ring-0 focus:outline-none bg-white text-sm"
-                    />
-                    <button
-                        type="submit"
-                        disabled={!text || !text.trim()}
-                        className={`p-2.5 rounded-full transition-all ${(text && text.trim()) ? 'bg-[#00a884] text-white hover:bg-[#008069]' : 'bg-gray-200 text-gray-400'}`}
-                    >
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                        </svg>
-                    </button>
-                </form>
-            </div>
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (text && text.trim()) {
+      contextHandleSubmit(e as any);
+      inputRef.current?.focus();
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+  };
+
+  return (
+    <div className="str-chat__input-flat custom-input-wrapper bg-[#f0f2f5] px-4 py-3 w-full">
+      <div className="flex items-center gap-2 w-full h-full">
+        <div className="relative">
+          <button 
+            type="button"
+            className="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            <Smile size={24} />
+          </button>
+          {showEmojiPicker && (
+            <EmojiPicker 
+              onSelect={handleEmojiSelect} 
+              onClose={() => setShowEmojiPicker(false)} 
+            />
+          )}
         </div>
-    );
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileSelect}
+          className="hidden"
+          multiple
+          accept="image/*,.pdf,.doc,.docx"
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors flex-shrink-0"
+          title="Attach file"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+          </svg>
+        </button>
+        <form onSubmit={handleFormSubmit} className="flex-1 flex items-center gap-2 min-w-0">
+          <input
+            ref={inputRef}
+            type="text"
+            value={text || ''}
+            onChange={handleInputChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleFormSubmit(e as any);
+              }
+            }}
+            placeholder="Type a message"
+            className="flex-1 py-2.5 px-4 rounded-lg border-none focus:ring-0 focus:outline-none bg-white text-sm min-w-0"
+          />
+          <button
+            type="submit"
+            disabled={!text || !text.trim()}
+            className={`p-2.5 rounded-full transition-all flex-shrink-0 ${(text && text.trim()) ? 'bg-[#00a884] text-white hover:bg-[#008069]' : 'bg-gray-200 text-gray-400'}`}
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 };
 const CustomChannelHeader: React.FC<any> = (props) => {
     const { client, setActiveChannel, channel: contextChannel } = useChatContext();
@@ -249,11 +272,12 @@ const customReactionOptions = [
 ];
 
 const KonvosChatInner: React.FC = () => {
-    const { client, setActiveChannel, channel } = useChatContext();
-    const { activeCall } = useAuth();
-    const [isSearching, setIsSearching] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [showArchived, setShowArchived] = useState(false);
+  const { client, setActiveChannel, channel } = useChatContext();
+  const { activeCall } = useAuth();
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
     // Sort: by last message
     const sort: any = React.useMemo(() => ([{ last_message_at: -1 }]), []);
@@ -324,7 +348,7 @@ const KonvosChatInner: React.FC = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100 overflow-hidden konvos-theme">
+        <div className={`flex h-screen overflow-hidden konvos-theme ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-100'}`}>
             {activeCall && (
                 <StreamCall call={activeCall}>
                     <CallInterface />
@@ -340,6 +364,8 @@ const KonvosChatInner: React.FC = () => {
                     onToggleArchived={() => setShowArchived(!showArchived)}
                     showArchived={showArchived}
                     onCreateGroup={handleCreateGroup}
+                    onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+                    isDarkMode={isDarkMode}
                 />
 
                 {isSearching ? (
