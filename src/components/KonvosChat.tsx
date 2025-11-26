@@ -52,16 +52,13 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
 };
 
 const CustomMessageInput: React.FC = () => {
-  const { text = '', setText, handleSubmit: contextHandleSubmit, uploadFile } = useMessageInputContext();
+  const { text = '', setText, handleSubmit, uploadFile } = useMessageInputContext();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleEmojiSelect = (emoji: string) => {
-    const newText = (text || '') + emoji;
-    setText(newText);
+    setText((text || '') + emoji);
     setShowEmojiPicker(false);
-    inputRef.current?.focus();
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,28 +69,16 @@ const CustomMessageInput: React.FC = () => {
     e.currentTarget.value = '';
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (text && text.trim()) {
-      contextHandleSubmit(e as any);
-      inputRef.current?.focus();
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setText(e.target.value);
-  };
-
   return (
-    <div className="str-chat__input-flat custom-input-wrapper bg-[#f0f2f5] px-4 py-3 w-full">
-      <div className="flex items-center gap-2 w-full h-full">
+    <div className="str-chat__input-flat custom-input-wrapper">
+      <div className="flex items-center gap-2 w-full">
         <div className="relative">
           <button 
             type="button"
-            className="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors"
+            className="text-gray-500 hover:bg-gray-200 p-2 rounded-full transition-colors flex-shrink-0"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
           >
-            <Smile size={24} />
+            <Smile size={20} />
           </button>
           {showEmojiPicker && (
             <EmojiPicker 
@@ -120,20 +105,13 @@ const CustomMessageInput: React.FC = () => {
             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
           </svg>
         </button>
-        <form onSubmit={handleFormSubmit} className="flex-1 flex items-center gap-2 min-w-0">
+        <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
           <input
-            ref={inputRef}
             type="text"
             value={text || ''}
-            onChange={handleInputChange}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleFormSubmit(e as any);
-              }
-            }}
+            onChange={(e) => setText(e.target.value)}
             placeholder="Type a message"
-            className="flex-1 py-2.5 px-4 rounded-lg border-none focus:ring-0 focus:outline-none bg-white text-sm min-w-0"
+            className="flex-1 py-2.5 px-4 rounded-lg border-none focus:ring-0 focus:outline-none bg-white text-sm"
           />
           <button
             type="submit"
@@ -281,13 +259,12 @@ const KonvosChatInner: React.FC = () => {
 
     // Sort: by last message
     const sort: any = React.useMemo(() => ([{ last_message_at: -1 }]), []);
-
-    // Only show channels with messages (recent conversations)
-    const filters: any = React.useMemo(() => ({
-        type: 'messaging',
+    
+    // Show recent conversations
+    const filters: any = React.useMemo(() => ({ 
+        type: 'messaging', 
         members: { $in: [client.userID!] },
-        hidden: showArchived,
-        last_message_at: { $exists: true }
+        hidden: showArchived
     }), [client.userID, showArchived]);
 
     const handleUserSelect = async (userId: string) => {
@@ -396,16 +373,15 @@ const KonvosChatInner: React.FC = () => {
                         Input={CustomMessageInput}
                         reactionOptions={customReactionOptions}
                         key={channel.cid}
-                        messages={channel.state.messages}
                     >
-                        <Window>
+                        <div className="flex flex-col h-full">
                             <CustomChannelHeader channel={channel} />
                             <MessageList
                                 messageActions={['react', 'reply', 'delete', 'edit']}
                                 noGroupByUser={false}
                             />
                             <CustomMessageInput />
-                        </Window>
+                        </div>
                     </Channel>
                 )}
             </div>

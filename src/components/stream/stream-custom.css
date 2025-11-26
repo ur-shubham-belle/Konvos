@@ -162,28 +162,22 @@
 }
 
 .str-chat__input-flat,
-.custom-input-wrapper {
+.str-chat__input-flat-wrapper {
   background-color: #f0f2f5 !important;
-  padding: 12px !important;
+  padding: 10px 16px !important;
   position: relative !important;
   z-index: 10 !important;
   display: flex !important;
   width: 100% !important;
   height: auto !important;
-  min-height: 65px !important;
+  min-height: 60px !important;
   flex-shrink: 0 !important;
+  border: none !important;
 }
 
 .dark .str-chat__input-flat,
-.dark .custom-input-wrapper {
+.dark .str-chat__input-flat-wrapper {
   background-color: #2a2a2a !important;
-}
-
-.str-chat__input-flat-wrapper {
-  background-color: white;
-  border-radius: 8px;
-  border: none;
-  display: flex;
 }
 
 .str-chat__send-button {
