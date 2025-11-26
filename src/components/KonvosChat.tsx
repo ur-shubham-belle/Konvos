@@ -52,102 +52,40 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
 };
 
 const CustomMessageInput: React.FC = () => {
-  const context = useMessageInputContext();
-  const { text = '', setText, handleSubmit, uploadFile } = context;
+  const { text, setText, handleSubmit } = useMessageInputContext();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEmojiSelect = (emoji: string) => {
-    const newText = (text || '') + emoji;
-    setText(newText);
+    setText((text || '') + emoji);
     setShowEmojiPicker(false);
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.currentTarget.files;
-    if (files && uploadFile) {
-      for (let i = 0; i < files.length; i++) {
-        uploadFile(files[i]);
-      }
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (text?.trim()) {
-      handleSubmit(e);
-    }
-  };
-
   return (
-    <div className="str-chat__input-flat custom-message-input">
-      <div className="flex items-center gap-3 w-full px-2 py-2">
-        {/* Emoji Button */}
-        <div className="relative flex-shrink-0">
-          <button 
-            type="button"
-            className="p-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors"
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            title="Add emoji"
-          >
-            <Smile size={20} />
-          </button>
-          {showEmojiPicker && (
-            <EmojiPicker 
-              onSelect={handleEmojiSelect} 
-              onClose={() => setShowEmojiPicker(false)} 
-            />
-          )}
-        </div>
-
-        {/* File Upload */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          onChange={handleFileSelect}
-          className="hidden"
-          multiple
-          accept="image/*,.pdf,.doc,.docx"
-        />
-        <button
+    <div className="custom-input-container">
+      <div className="flex items-center gap-2 p-3">
+        <button 
           type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="p-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors flex-shrink-0"
-          title="Attach file"
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          className="p-2 hover:bg-gray-200 rounded-full"
         >
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-          </svg>
+          <Smile size={20} />
         </button>
-
-        {/* Message Input Form */}
-        <form onSubmit={onSubmit} className="flex-1 flex items-center gap-2">
-          <input
-            type="text"
-            value={text || ''}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Type a message"
-            className="flex-1 py-2 px-3 bg-white rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#00a884]/20 focus:border-[#00a884]"
-          />
-          <button
-            type="submit"
-            disabled={!text?.trim()}
-            className={`p-2 rounded-full transition-all flex-shrink-0 ${
-              text?.trim() 
-                ? 'bg-[#00a884] text-white hover:bg-[#008069]' 
-                : 'bg-gray-200 text-gray-400'
-            }`}
-            title="Send message"
-          >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-            </svg>
-          </button>
-        </form>
+        {showEmojiPicker && (
+          <EmojiPicker onSelect={handleEmojiSelect} onClose={() => setShowEmojiPicker(false)} />
+        )}
       </div>
+      <form onSubmit={handleSubmit} className="px-3 pb-3 flex gap-2">
+        <input
+          type="text"
+          value={text || ''}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Type a message"
+          className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00a884]"
+        />
+        <button type="submit" disabled={!text?.trim()} className="px-4 py-2 bg-[#00a884] text-white rounded-full hover:bg-[#008069] disabled:bg-gray-300">
+          Send
+        </button>
+      </form>
     </div>
   );
 };
@@ -395,17 +333,10 @@ const KonvosChatInner: React.FC = () => {
                 ) : (
                     <Channel
                         Input={CustomMessageInput}
-                        reactionOptions={customReactionOptions}
                         key={channel.cid}
                     >
-                        <div className="flex flex-col h-full w-full bg-white">
-                            <CustomChannelHeader channel={channel} />
-                            <MessageList
-                                messageActions={['react', 'reply', 'delete', 'edit']}
-                                noGroupByUser={false}
-                            />
-                            <CustomMessageInput />
-                        </div>
+                        <CustomChannelHeader channel={channel} />
+                        <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
                     </Channel>
                 )}
             </div>

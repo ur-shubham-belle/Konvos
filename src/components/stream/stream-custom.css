@@ -45,11 +45,8 @@
 
 /* Chat Panel flowing background - light multicolor gradient */
 .chat-panel-flowing-bg {
-  background: linear-gradient(-45deg, #fff8e7, #fef3cd, #fce8c3, #f5e6d3, #fff8e7) !important;
-  background-size: 400% 400% !important;
-  animation: flowingGradient 25s ease infinite !important;
+  background: linear-gradient(135deg, #fef5e7 0%, #fce4d6 25%, #f5e6d3 50%, #e8d5c4 75%, #fef5e7 100%) !important;
   position: relative !important;
-  overflow: visible !important;
 }
 
 .str-chat__channel-list {
@@ -147,12 +144,11 @@
 }
 
 .str-chat__input-flat,
-.custom-message-input {
+.custom-input-container {
   background-color: #f0f2f5 !important;
-  padding: 8px 16px !important;
+  padding: 0 !important;
   position: relative !important;
   z-index: 10 !important;
-  display: flex !important;
   width: 100% !important;
   height: auto !important;
   flex-shrink: 0 !important;
@@ -161,7 +157,7 @@
 }
 
 .dark .str-chat__input-flat,
-.dark .custom-message-input {
+.dark .custom-input-container {
   background-color: #2a2a2a !important;
 }
 
