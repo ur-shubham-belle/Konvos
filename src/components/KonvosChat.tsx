@@ -55,7 +55,7 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
 };
 
 const CustomMessageInput: React.FC = () => {
-  const { text, setText, handleSubmit } = useMessageInputContext();
+  const { text = '', setText, handleSubmit } = useMessageInputContext();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleEmojiSelect = (emoji: string) => {
