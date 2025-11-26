@@ -293,13 +293,33 @@ const KonvosChatInner: React.FC = () => {
       const newChannel = client.channel('messaging', {
         members: [client.userID!, userId],
       });
-      await newChannel.create();
+      
+      // Create channel and wait for it
+      const response = await newChannel.create();
+      console.log('Channel created:', response);
+      
+      // Watch the channel
       await newChannel.watch();
+      console.log('Channel watched, setting as active');
+      
+      // Set active channel
       setActiveChannel(newChannel);
       setIsSearching(false);
       setSearchQuery('');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create or select channel:', error);
+      // Try to still show the channel even if create failed
+      const fallbackChannel = client.channel('messaging', {
+        members: [client.userID!, userId],
+      });
+      try {
+        await fallbackChannel.watch();
+        setActiveChannel(fallbackChannel);
+        setIsSearching(false);
+        setSearchQuery('');
+      } catch (fallbackError) {
+        console.error('Fallback failed:', fallbackError);
+      }
     }
   };
   
@@ -363,20 +383,22 @@ const KonvosChatInner: React.FC = () => {
             <p className="text-sm text-gray-500">Send and receive messages without keeping your phone online.</p>
             <p className="text-sm text-gray-500 mt-2">Use Konvos on up to 4 linked devices and 1 phone.</p>
           </div>
-          ) : (
-          <Channel 
-            Input={CustomMessageInput}
-            reactionOptions={customReactionOptions}
-          >
-            <Window>
-              <CustomChannelHeader />
-              <MessageList 
-                messageActions={['react', 'reply', 'delete', 'edit']}
-              />
-              <MessageInput focus />
-            </Window>
-          </Channel>
-        )}
+         ) : (
+         <Channel 
+           Input={CustomMessageInput}
+           reactionOptions={customReactionOptions}
+           key={channel.cid}
+         >
+           <Window>
+             <CustomChannelHeader channel={channel} />
+             <MessageList 
+               messageActions={['react', 'reply', 'delete', 'edit']}
+               noGroupByUser={false}
+             />
+             <MessageInput focus />
+           </Window>
+         </Channel>
+       )}
       </div>
     </div>
   );
