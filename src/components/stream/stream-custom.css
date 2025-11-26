@@ -59,6 +59,7 @@
   display: none;
 }
 
+/* Ensure background image covers the whole chat window */
 .str-chat__main-panel {
   display: flex;
   flex-direction: column;
@@ -66,6 +67,7 @@
 }
 
 .str-chat__list {
+<<<<<<< Updated upstream
   background-color: transparent;
 }
 
@@ -79,6 +81,50 @@
   background-size: 400px;
   background-color: transparent;
   height: 100%;
+=======
+  /* Sidebar background */
+  background-color: #ffffff; 
+}
+
+/* Target the Message List container specifically */
+.str-chat__ul.str-chat__list {
+    background-color: transparent;
+}
+
+/* Make sure the main chat window has the background */
+.str-chat__channel {
+    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png') !important;
+    background-repeat: repeat !important;
+    background-size: 400px !important; 
+    background-color: #efeae2 !important;
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* Force list container to be visible and scrollable */
+.str-chat__channel-list {
+    height: 100% !important;
+    width: 100% !important;
+    overflow-y: auto !important;
+    background-color: #ffffff;
+}
+
+/* Ensure the main panel takes full height */
+.str-chat__main-panel {
+    height: 100% !important;
+    width: 100% !important;
+    flex: 1;
+}
+
+/* Make sure the message list is transparent so background shows */
+.str-chat__list, .str-chat__ul {
+    background-color: transparent !important;
+}
+
+/* Override Stream's default white background on the window if present */
+.str-chat__container {
+    background-color: transparent !important;
+>>>>>>> Stashed changes
 }
 
 .str-chat__message-simple__content--own {

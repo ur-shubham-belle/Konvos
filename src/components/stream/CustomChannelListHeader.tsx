@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChatContext } from 'stream-chat-react';
+<<<<<<< Updated upstream
 import { Search, X, MoreVertical, LogOut, Archive, Users } from 'lucide-react';
+=======
+import { Search, X, MessageSquarePlus, MoreVertical, LogOut, Archive, Users } from 'lucide-react';
+>>>>>>> Stashed changes
 import { useAuth } from '../../context/AuthContext';
 import { Avatar } from '../common/Avatar';
 
@@ -8,9 +12,15 @@ interface CustomChannelListHeaderProps {
   onSearch: (query: string) => void;
   isSearching: boolean;
   setIsSearching: (isSearching: boolean) => void;
+<<<<<<< Updated upstream
   onToggleArchived?: () => void;
   showArchived?: boolean;
   onCreateGroup?: () => void;
+=======
+  onToggleArchived: () => void;
+  showArchived: boolean;
+  onCreateGroup: () => void;
+>>>>>>> Stashed changes
 }
 
 export const CustomChannelListHeader: React.FC<CustomChannelListHeaderProps> = ({ 
@@ -56,6 +66,7 @@ export const CustomChannelListHeader: React.FC<CustomChannelListHeaderProps> = (
       {/* Main Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
+<<<<<<< Updated upstream
           <div className="relative">
             <Avatar src={user?.image || ''} alt={user?.name || ''} size="md" />
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
@@ -84,6 +95,21 @@ export const CustomChannelListHeader: React.FC<CustomChannelListHeaderProps> = (
             >
               <MoreVertical size={20} />
             </button>
+=======
+          <Avatar src={user?.image || ''} alt={user?.name || ''} size="md" />
+          <h1 className="text-xl font-bold text-[#00a884]">{showArchived ? 'Archived' : 'Konvos'}</h1>
+        </div>
+        <div className="flex items-center gap-4 text-gray-600">
+          <button 
+             className="p-2 hover:bg-gray-200 rounded-full" 
+             title="New Group"
+             onClick={onCreateGroup}
+          >
+            <Users size={20} />
+          </button>
+          <button className="p-2 hover:bg-gray-200 rounded-full relative" onClick={() => setShowMenu(!showMenu)}>
+            <MoreVertical size={20} />
+>>>>>>> Stashed changes
             {showMenu && (
               <div className="absolute right-0 top-10 bg-white shadow-xl rounded-lg py-2 w-48 z-50 border border-gray-100">
                 {onToggleArchived && (
@@ -96,8 +122,19 @@ export const CustomChannelListHeader: React.FC<CustomChannelListHeaderProps> = (
                   </button>
                 )}
                 <button 
+<<<<<<< Updated upstream
                   onClick={() => { logout(); setShowMenu(false); }}
                   className="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-red-600 transition-colors"
+=======
+                  onClick={() => { onToggleArchived(); setShowMenu(false); }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-gray-700"
+                >
+                  <Archive size={16} /> {showArchived ? 'Show Active Chats' : 'Archived Chats'}
+                </button>
+                <button 
+                  onClick={logout}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600"
+>>>>>>> Stashed changes
                 >
                   <LogOut size={16} /> Logout
                 </button>
