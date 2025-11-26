@@ -30,9 +30,9 @@
 
 /* Chat Panel flowing background - warm subtle gradient */
 .chat-panel-flowing-bg {
-  background: linear-gradient(-45deg, #fef3e2, #fce7c8, #fef9e7, #fde4b7);
-  background-size: 400% 400%;
-  animation: flowingGradientPanel 20s ease infinite;
+  background: linear-gradient(-45deg, #fef3e2, #fce7c8, #fef9e7, #fde4b7) !important;
+  background-size: 400% 400% !important;
+  animation: flowingGradientPanel 20s ease infinite !important;
 }
 
 .str-chat__channel-list {
