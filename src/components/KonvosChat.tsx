@@ -15,6 +15,7 @@ import { CustomChannelListHeader } from './stream/CustomChannelListHeader';
 import { UserList } from './stream/UserList';
 import { CallInterface } from './stream/CallInterface';
 import { CustomChannelPreview } from './stream/custom-channel-preview';
+import { MobileChannelList } from './stream/MobileChannelList';
 import { useAuth } from '../context/AuthContext';
 import { Video, Phone, MoreVertical, Trash2, ArrowLeft } from 'lucide-react';
 import 'stream-chat-react/dist/css/v2/index.css';
@@ -118,6 +119,7 @@ const KonvosChatInner: React.FC = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showArchived, setShowArchived] = useState(false);
+    const [mobileShowChat, setMobileShowChat] = useState(false);
 
     const filters = {
         type: 'messaging',
@@ -127,6 +129,17 @@ const KonvosChatInner: React.FC = () => {
 
     const sort = [{ last_message_at: -1 }];
 
+    const handleMobileChannelClick = (selectedChannel: any) => {
+        setActiveChannel(selectedChannel);
+        setMobileShowChat(true);
+    };
+
+    const handleBackToList = () => {
+        setMobileShowChat(false);
+        setIsSearching(false);
+        setSearchQuery('');
+    };
+
     const handleUserSelect = async (userId: string) => {
         try {
             const newChannel = client.channel('messaging', {
@@ -135,6 +148,7 @@ const KonvosChatInner: React.FC = () => {
             await newChannel.create();
             await newChannel.watch();
             setActiveChannel(newChannel);
+            setMobileShowChat(true);
             setIsSearching(false);
             setSearchQuery('');
         } catch (error: any) {
@@ -145,18 +159,13 @@ const KonvosChatInner: React.FC = () => {
             try {
                 await fallbackChannel.watch();
                 setActiveChannel(fallbackChannel);
+                setMobileShowChat(true);
                 setIsSearching(false);
                 setSearchQuery('');
             } catch (fallbackError) {
                 console.error('Fallback failed:', fallbackError);
             }
         }
-    };
-
-    const handleBackToList = () => {
-        setActiveChannel(undefined);
-        setIsSearching(false);
-        setSearchQuery('');
     };
 
     return (
@@ -215,7 +224,7 @@ const KonvosChatInner: React.FC = () => {
 
             {/* Mobile: Full Screen (Chat List OR Chat View) */}
             <div className="flex md:hidden flex-col w-full h-full bg-white">
-                {!channel ? (
+                {!mobileShowChat ? (
                     // Show Chat List on Mobile
                     <>
                         <CustomChannelListHeader
@@ -232,30 +241,32 @@ const KonvosChatInner: React.FC = () => {
                         {isSearching ? (
                             <UserList query={searchQuery} onUserSelect={handleUserSelect} />
                         ) : (
-                            <ChannelList
+                            <MobileChannelList
                                 filters={filters}
                                 sort={sort}
-                                Preview={CustomChannelPreview}
+                                onChannelClick={handleMobileChannelClick}
                             />
                         )}
                     </>
                 ) : (
                     // Show Chat View on Mobile
-                    <Channel key={channel.cid}>
-                        <Window>
-                            <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 h-[60px]">
-                                <button
-                                    onClick={handleBackToList}
-                                    className="p-2 text-gray-600 hover:bg-gray-200 rounded-full"
-                                >
-                                    <ArrowLeft size={20} />
-                                </button>
-                                <ChannelHeader />
-                            </div>
-                            <MessageList messageActions={['react', 'delete', 'edit']} />
-                            <MessageInput autoFocus />
-                        </Window>
-                    </Channel>
+                    channel && (
+                        <Channel key={channel.cid}>
+                            <Window>
+                                <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 h-[60px]">
+                                    <button
+                                        onClick={handleBackToList}
+                                        className="p-2 text-gray-600 hover:bg-gray-200 rounded-full"
+                                    >
+                                        <ArrowLeft size={20} />
+                                    </button>
+                                    <ChannelHeader />
+                                </div>
+                                <MessageList messageActions={['react', 'delete', 'edit']} />
+                                <MessageInput autoFocus />
+                            </Window>
+                        </Channel>
+                    )
                 )}
             </div>
         </div>
