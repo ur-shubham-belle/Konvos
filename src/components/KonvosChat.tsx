@@ -8,6 +8,7 @@ import {
     MessageList,
     MessageInput,
     useChatContext,
+    Message,
 } from 'stream-chat-react';
 import { useStreamVideoClient } from '@stream-io/video-react-sdk';
 import { StreamCall } from '@stream-io/video-react-sdk';
@@ -75,6 +76,22 @@ const ReplyBar: React.FC<{ message: any; onClear: () => void }> = ({ message, on
                 ✕
             </button>
         </div>
+    );
+};
+
+const CustomMessage: React.FC<any> = (props) => {
+    const { onReply } = props;
+    
+    return (
+        <Message 
+            {...props}
+            actions={props.messageActions}
+            onReplyAction={() => {
+                if (onReply) {
+                    onReply(props.message);
+                }
+            }}
+        />
     );
 };
 
@@ -311,11 +328,7 @@ const KonvosChatInner: React.FC = () => {
                             <CustomChannelHeader channel={channel} />
                             <MessageList 
                                 messageActions={['react', 'reply', 'delete', 'edit']}
-                                onMessageAction={(action: string, message: any) => {
-                                    if (action === 'reply') {
-                                        handleReply(message);
-                                    }
-                                }}
+                                Message={(msg) => <CustomMessage {...msg} onReply={handleReply} />}
                             />
                             {repliedTo && <ReplyBar message={repliedTo} onClear={clearReply} />}
                             <EmojiInputWrapper>
@@ -359,11 +372,7 @@ const KonvosChatInner: React.FC = () => {
                             <CustomChannelHeader channel={channel} />
                             <MessageList 
                                 messageActions={['react', 'reply', 'delete', 'edit']}
-                                onMessageAction={(action: string, message: any) => {
-                                    if (action === 'reply') {
-                                        handleReply(message);
-                                    }
-                                }}
+                                Message={(msg) => <CustomMessage {...msg} onReply={handleReply} />}
                             />
                             {repliedTo && <ReplyBar message={repliedTo} onClear={clearReply} />}
                             <EmojiInputWrapper>
