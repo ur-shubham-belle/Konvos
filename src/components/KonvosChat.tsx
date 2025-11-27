@@ -282,7 +282,7 @@ const KonvosChatInner: React.FC = () => {
                     <Channel key={channel.cid}>
                         <Window>
                             <CustomChannelHeader channel={channel} />
-                            <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
+                            <MessageList messageActions={['react', 'delete', 'edit']} />
                             <EmojiInputWrapper>
                                 <MessageInput focus />
                             </EmojiInputWrapper>
@@ -322,7 +322,7 @@ const KonvosChatInner: React.FC = () => {
                     <Channel key={channel.cid}>
                         <Window>
                             <CustomChannelHeader channel={channel} />
-                            <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
+                            <MessageList messageActions={['react', 'delete', 'edit']} />
                             <EmojiInputWrapper>
                                 <MessageInput focus />
                             </EmojiInputWrapper>
