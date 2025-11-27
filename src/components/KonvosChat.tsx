@@ -199,6 +199,12 @@ const KonvosChatInner: React.FC = () => {
     const [showArchived, setShowArchived] = useState(false);
     const [showMobileChat, setShowMobileChat] = useState(false);
 
+    useEffect(() => {
+        if (channel) {
+            setShowMobileChat(true);
+        }
+    }, [channel?.cid]);
+
     const filters = {
         type: 'messaging',
         members: { $in: [client.userID!] },
@@ -285,7 +291,7 @@ const KonvosChatInner: React.FC = () => {
                             <CustomChannelHeader channel={channel} />
                             <MessageList messageActions={['react', 'delete', 'edit']} />
                             <EmojiInputWrapper>
-                                <MessageInput focus />
+                                <MessageInput focus autoFocus />
                             </EmojiInputWrapper>
                         </Window>
                     </Channel>
@@ -315,7 +321,6 @@ const KonvosChatInner: React.FC = () => {
                                         filters={filters}
                                         sort={sort}
                                         Preview={CustomChannelPreview}
-                                        onSelect={() => setShowMobileChat(true)}
                                     />
                                 </div>
                             )}
