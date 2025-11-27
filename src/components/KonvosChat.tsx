@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Chat,
     Channel,
@@ -16,90 +16,11 @@ import { UserList } from './stream/UserList';
 import { CallInterface } from './stream/CallInterface';
 import { CustomChannelPreview } from './stream/custom-channel-preview';
 import { useAuth } from '../context/AuthContext';
-import { Video, Phone, MoreVertical, Trash2, ArrowLeft, Smile } from 'lucide-react';
+import { Video, Phone, MoreVertical, Trash2, ArrowLeft } from 'lucide-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import './stream/stream-custom.css';
 
-const EMOJI_LIST = ['😀', '😂', '😍', '🥰', '😎', '🤔', '👍', '👎', '❤️', '🔥', '🎉', '👏'];
 
-const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => void }> = ({
-    onSelect,
-    onClose,
-}) => {
-    const ref = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) {
-                onClose();
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [onClose]);
-
-    return (
-        <div ref={ref} className="emoji-picker-container">
-            <div className="emoji-grid">
-                {EMOJI_LIST.map((emoji) => (
-                    <button
-                        key={emoji}
-                        className="emoji-btn"
-                        onClick={() => {
-                            onSelect(emoji);
-                            onClose();
-                        }}
-                    >
-                        {emoji}
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-
-
-const EmojiInputWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [showEmoji, setShowEmoji] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    const handleEmojiSelect = (emoji: string) => {
-        const inputElement = containerRef.current?.querySelector('input');
-        if (inputElement) {
-            const start = inputElement.selectionStart || 0;
-            const end = inputElement.selectionEnd || 0;
-            const text = inputElement.value;
-            const newText = text.substring(0, start) + emoji + text.substring(end);
-            inputElement.value = newText;
-            inputElement.dispatchEvent(new Event('change', { bubbles: true }));
-            inputElement.focus();
-            inputElement.setSelectionRange(start + emoji.length, start + emoji.length);
-        }
-        setShowEmoji(false);
-    };
-
-    return (
-        <div className="flex items-center gap-2 relative" ref={containerRef}>
-            <button
-                type="button"
-                onClick={() => setShowEmoji(!showEmoji)}
-                className="p-2 hover:bg-gray-100 rounded text-gray-600 flex-shrink-0"
-                title="Add emoji"
-            >
-                <Smile size={20} />
-            </button>
-            <div className="flex-1 relative">
-                {showEmoji && (
-                    <div className="absolute bottom-full left-0 z-50 mb-2">
-                        <EmojiPicker onSelect={handleEmojiSelect} onClose={() => setShowEmoji(false)} />
-                    </div>
-                )}
-                {children}
-            </div>
-        </div>
-    );
-};
 
 const CustomChannelHeader: React.FC<any> = (props) => {
     const { client, setActiveChannel, channel: contextChannel } = useChatContext();
@@ -290,9 +211,7 @@ const KonvosChatInner: React.FC = () => {
                         <Window>
                             <CustomChannelHeader channel={channel} />
                             <MessageList messageActions={['react', 'delete', 'edit']} />
-                            <EmojiInputWrapper>
-                                <MessageInput focus autoFocus />
-                            </EmojiInputWrapper>
+                            <MessageInput focus />
                         </Window>
                     </Channel>
                 )}
@@ -341,9 +260,7 @@ const KonvosChatInner: React.FC = () => {
                                     <ChannelHeader />
                                 </div>
                                 <MessageList messageActions={['react', 'delete', 'edit']} />
-                                <EmojiInputWrapper>
-                                    <MessageInput focus />
-                                </EmojiInputWrapper>
+                                <MessageInput autoFocus />
                             </Window>
                         </Channel>
                     ) : null}
