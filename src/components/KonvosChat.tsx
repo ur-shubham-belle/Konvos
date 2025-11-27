@@ -283,7 +283,7 @@ const KonvosChatInner: React.FC = () => {
                                     >
                                         <ArrowLeft size={20} />
                                     </button>
-                                    <div className="flex-1 flex items-center justify-center">
+                                    <div className="flex-1 flex items-center justify-start">
                                         <ChannelHeader />
                                     </div>
                                 </div>
