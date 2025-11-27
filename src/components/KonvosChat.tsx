@@ -16,11 +16,31 @@ import { UserList } from './stream/UserList';
 import { CallInterface } from './stream/CallInterface';
 import { CustomChannelPreview } from './stream/custom-channel-preview';
 import { useAuth } from '../context/AuthContext';
-import { Video, Phone, MoreVertical, Trash2, ArrowLeft, Smile } from 'lucide-react';
+import { Video, Phone, MoreVertical, Trash2, ArrowLeft, Smile, X } from 'lucide-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import './stream/stream-custom.css';
 
+interface ReplyMessage {
+    id: string;
+    text: string;
+    userName: string;
+}
+
 const EMOJI_LIST = ['😀', '😂', '😍', '🥰', '😎', '🤔', '👍', '👎', '❤️', '🔥', '🎉', '👏'];
+
+const ReplyBar: React.FC<{ message: ReplyMessage; onClear: () => void }> = ({ message, onClear }) => {
+    return (
+        <div className="bg-blue-50 border-l-4 border-blue-500 px-4 py-2 flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+                <p className="text-xs text-blue-600 font-semibold mb-1">Replying to {message.userName}</p>
+                <p className="text-sm text-gray-700 truncate">{message.text}</p>
+            </div>
+            <button onClick={onClear} className="ml-3 text-gray-400 hover:text-gray-600">
+                <X size={18} />
+            </button>
+        </div>
+    );
+};
 
 const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => void }> = ({
     onSelect,
@@ -59,6 +79,31 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
 };
 
 
+
+const CustomMessageWrapper: React.FC<any> = (props) => {
+    const { message, onReply, messageActions } = props;
+    
+    return (
+        <div 
+            className="relative group"
+            onContextMenu={(e) => {
+                e.preventDefault();
+                if (onReply) onReply(message);
+            }}
+        >
+            {props.children}
+            {messageActions?.includes('reply') && (
+                <button
+                    onClick={() => onReply?.(message)}
+                    className="absolute -right-12 top-0 opacity-0 group-hover:opacity-100 transition-opacity p-2 text-gray-500 hover:text-blue-600 text-sm"
+                    title="Reply"
+                >
+                    ↳
+                </button>
+            )}
+        </div>
+    );
+};
 
 const EmojiInputWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [showEmoji, setShowEmoji] = useState(false);
@@ -197,6 +242,7 @@ const KonvosChatInner: React.FC = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showArchived, setShowArchived] = useState(false);
+    const [repliedTo, setRepliedTo] = useState<ReplyMessage | null>(null);
 
     const filters = {
         type: 'messaging',
@@ -230,6 +276,14 @@ const KonvosChatInner: React.FC = () => {
                 console.error('Fallback failed:', fallbackError);
             }
         }
+    };
+
+    const handleReply = (message: any) => {
+        setRepliedTo({
+            id: message.id,
+            text: message.text || '',
+            userName: message.user?.name || 'User',
+        });
     };
 
     return (
@@ -282,17 +336,30 @@ const KonvosChatInner: React.FC = () => {
                     <Channel key={channel.cid}>
                         <Window>
                             <CustomChannelHeader channel={channel} />
-                            <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
+                            <MessageList 
+                                messageActions={['react', 'reply', 'delete', 'edit']}
+                                Message={(msgProps: any) => (
+                                    <CustomMessageWrapper {...msgProps} onReply={handleReply} messageActions={['react', 'reply', 'delete', 'edit']}>
+                                        {msgProps.children}
+                                    </CustomMessageWrapper>
+                                )}
+                            />
+                            {repliedTo && (
+                                <ReplyBar 
+                                    message={repliedTo} 
+                                    onClear={() => setRepliedTo(null)} 
+                                />
+                            )}
                             <EmojiInputWrapper>
-                                <MessageInput focus />
+                                <MessageInput focus parentId={repliedTo?.id} />
                             </EmojiInputWrapper>
                         </Window>
                     </Channel>
                 )}
-            </div>
+                </div>
 
-            {/* Mobile View */}
-            <div className="flex md:hidden flex-col w-full h-full bg-white">
+                {/* Mobile View */}
+                <div className="flex md:hidden flex-col w-full h-full bg-white">
                 {!channel ? (
                     <div className="flex flex-col">
                         <CustomChannelListHeader
@@ -322,9 +389,22 @@ const KonvosChatInner: React.FC = () => {
                     <Channel key={channel.cid}>
                         <Window>
                             <CustomChannelHeader channel={channel} />
-                            <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
+                            <MessageList 
+                                messageActions={['react', 'reply', 'delete', 'edit']}
+                                Message={(msgProps: any) => (
+                                    <CustomMessageWrapper {...msgProps} onReply={handleReply} messageActions={['react', 'reply', 'delete', 'edit']}>
+                                        {msgProps.children}
+                                    </CustomMessageWrapper>
+                                )}
+                            />
+                            {repliedTo && (
+                                <ReplyBar 
+                                    message={repliedTo} 
+                                    onClear={() => setRepliedTo(null)} 
+                                />
+                            )}
                             <EmojiInputWrapper>
-                                <MessageInput focus />
+                                <MessageInput focus parentId={repliedTo?.id} />
                             </EmojiInputWrapper>
                         </Window>
                     </Channel>
