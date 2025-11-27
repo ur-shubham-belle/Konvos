@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     Chat,
     Channel,
@@ -118,13 +118,6 @@ const KonvosChatInner: React.FC = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showArchived, setShowArchived] = useState(false);
-    const [showMobileChat, setShowMobileChat] = useState(false);
-
-    useEffect(() => {
-        if (channel) {
-            setShowMobileChat(true);
-        }
-    }, [channel?.cid]);
 
     const filters = {
         type: 'messaging',
@@ -160,6 +153,12 @@ const KonvosChatInner: React.FC = () => {
         }
     };
 
+    const handleBackToList = () => {
+        setActiveChannel(undefined);
+        setIsSearching(false);
+        setSearchQuery('');
+    };
+
     return (
         <div className="flex h-screen overflow-hidden flowing-gradient-bg">
             {activeCall && (
@@ -168,11 +167,8 @@ const KonvosChatInner: React.FC = () => {
                 </StreamCall>
             )}
 
-            {/* Chat List */}
-            <div
-                className={`hidden md:flex w-[400px] flex-col border-r border-gray-200 h-full bg-white ${channel ? '' : ''
-                    }`}
-            >
+            {/* Desktop: Chat List (Left Sidebar) */}
+            <div className="hidden md:flex w-[400px] flex-col border-r border-gray-200 h-full bg-white">
                 <CustomChannelListHeader
                     onSearch={setSearchQuery}
                     isSearching={isSearching}
@@ -191,8 +187,8 @@ const KonvosChatInner: React.FC = () => {
                 )}
             </div>
 
-            {/* Chat Panel */}
-            <div className="flex-1 hidden md:flex flex-col h-full">
+            {/* Desktop: Chat Panel (Right Main Area) */}
+            <div className="hidden md:flex flex-1 flex-col h-full">
                 {!channel ? (
                     <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-yellow-50 via-orange-50 to-yellow-50">
                         <div className="w-64 h-64 bg-white/50 backdrop-blur-sm rounded-full mb-8 flex items-center justify-center shadow-lg">
@@ -215,56 +211,53 @@ const KonvosChatInner: React.FC = () => {
                         </Window>
                     </Channel>
                 )}
-                </div>
+            </div>
 
-                {/* Mobile View */}
-                <div className="flex md:hidden flex-col w-full h-full bg-white">
-                    {!showMobileChat ? (
-                        <div className="flex flex-col h-full">
-                            <CustomChannelListHeader
-                                onSearch={setSearchQuery}
-                                isSearching={isSearching}
-                                setIsSearching={setIsSearching}
-                                onToggleArchived={() => setShowArchived(!showArchived)}
-                                showArchived={showArchived}
-                                onCreateGroup={undefined}
-                                onToggleTheme={undefined}
-                                isDarkMode={false}
+            {/* Mobile: Full Screen (Chat List OR Chat View) */}
+            <div className="flex md:hidden flex-col w-full h-full bg-white">
+                {!channel ? (
+                    // Show Chat List on Mobile
+                    <>
+                        <CustomChannelListHeader
+                            onSearch={setSearchQuery}
+                            isSearching={isSearching}
+                            setIsSearching={setIsSearching}
+                            onToggleArchived={() => setShowArchived(!showArchived)}
+                            showArchived={showArchived}
+                            onCreateGroup={undefined}
+                            onToggleTheme={undefined}
+                            isDarkMode={false}
+                        />
+
+                        {isSearching ? (
+                            <UserList query={searchQuery} onUserSelect={handleUserSelect} />
+                        ) : (
+                            <ChannelList
+                                filters={filters}
+                                sort={sort}
+                                Preview={CustomChannelPreview}
                             />
-
-                            {isSearching ? (
-                                <UserList query={searchQuery} onUserSelect={handleUserSelect} />
-                            ) : (
-                                <div className="flex-1 overflow-y-auto">
-                                    <ChannelList
-                                        filters={filters}
-                                        sort={sort}
-                                        Preview={CustomChannelPreview}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ) : channel ? (
-                        <Channel key={channel.cid}>
-                            <Window>
-                                <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 h-[60px]">
-                                    <button
-                                        onClick={() => {
-                                            setShowMobileChat(false);
-                                            setActiveChannel(undefined);
-                                        }}
-                                        className="p-2 text-gray-600 hover:bg-gray-200 rounded-full"
-                                    >
-                                        <ArrowLeft size={20} />
-                                    </button>
-                                    <ChannelHeader />
-                                </div>
-                                <MessageList messageActions={['react', 'delete', 'edit']} />
-                                <MessageInput autoFocus />
-                            </Window>
-                        </Channel>
-                    ) : null}
-                </div>
+                        )}
+                    </>
+                ) : (
+                    // Show Chat View on Mobile
+                    <Channel key={channel.cid}>
+                        <Window>
+                            <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 h-[60px]">
+                                <button
+                                    onClick={handleBackToList}
+                                    className="p-2 text-gray-600 hover:bg-gray-200 rounded-full"
+                                >
+                                    <ArrowLeft size={20} />
+                                </button>
+                                <ChannelHeader />
+                            </div>
+                            <MessageList messageActions={['react', 'delete', 'edit']} />
+                            <MessageInput autoFocus />
+                        </Window>
+                    </Channel>
+                )}
+            </div>
         </div>
     );
 };
