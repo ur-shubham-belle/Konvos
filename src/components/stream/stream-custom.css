@@ -145,6 +145,28 @@
   text-transform: uppercase;
 }
 
+/* Message actions styling */
+.str-chat__message-actions-box {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+}
+
+.str-chat__message-actions-list button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: #54656f;
+  transition: background-color 0.2s;
+}
+
+.str-chat__message-actions-list button:hover {
+  background-color: #f0f2f5;
+}
+
 /* Hide unwanted Stream components */
 .str-chat__message-actions-list button:has(span:contains("Mark as unread")),
 .str-chat__message-actions-list button:has(span:contains("Pin")) {
