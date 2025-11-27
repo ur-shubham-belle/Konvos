@@ -60,10 +60,10 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
 
 const EmojiInputWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [showEmoji, setShowEmoji] = useState(false);
-    const inputRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const handleEmojiSelect = (emoji: string) => {
-        const inputElement = inputRef.current?.querySelector('input');
+        const inputElement = containerRef.current?.querySelector('input');
         if (inputElement) {
             const start = inputElement.selectionStart || 0;
             const end = inputElement.selectionEnd || 0;
@@ -78,20 +78,23 @@ const EmojiInputWrapper: React.FC<{ children: React.ReactNode }> = ({ children }
     };
 
     return (
-        <div className="relative" ref={inputRef}>
-            <div className="absolute bottom-full right-0 z-50">
-                {showEmoji && (
-                    <EmojiPicker onSelect={handleEmojiSelect} onClose={() => setShowEmoji(false)} />
-                )}
-            </div>
+        <div className="flex items-center gap-2 relative" ref={containerRef}>
             <button
+                type="button"
                 onClick={() => setShowEmoji(!showEmoji)}
-                className="absolute bottom-3 left-3 z-40 p-1 hover:bg-gray-100 rounded text-gray-600"
+                className="p-2 hover:bg-gray-100 rounded text-gray-600 flex-shrink-0"
                 title="Add emoji"
             >
                 <Smile size={20} />
             </button>
-            <div className="pl-10">{children}</div>
+            <div className="flex-1 relative">
+                {showEmoji && (
+                    <div className="absolute bottom-full left-0 z-50 mb-2">
+                        <EmojiPicker onSelect={handleEmojiSelect} onClose={() => setShowEmoji(false)} />
+                    </div>
+                )}
+                {children}
+            </div>
         </div>
     );
 };

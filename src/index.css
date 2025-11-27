@@ -68,9 +68,9 @@
 }
 
 .str-chat__message-simple:not(.str-chat__message-simple--me) .str-chat__message-text-inner {
-  background-color: #ffffff !important;
+  background-color: transparent !important;
   color: var(--konvos-text-primary) !important;
-  box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+  box-shadow: none;
   border: none !important;
 }
 

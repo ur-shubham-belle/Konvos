@@ -39,7 +39,7 @@
 }
 
 .str-chat__message-simple__content--other {
-  background-color: var(--message-bubble-bg);
+  background-color: transparent;
   border-radius: 7.5px;
   border-top-left-radius: 0;
 }
@@ -146,7 +146,6 @@
 }
 
 /* Hide unwanted Stream components */
-.str-chat__message-actions-box button[aria-label="Thread reply"],
 .str-chat__message-actions-list button:has(span:contains("Mark as unread")),
 .str-chat__message-actions-list button:has(span:contains("Pin")) {
   display: none !important;
@@ -177,7 +176,7 @@
 /* Emoji picker styling - safe, non-intrusive */
 .emoji-picker-container {
   position: absolute;
-  bottom: 100%;
+  bottom: 45px;
   left: 0;
   z-index: 50;
   margin-bottom: 8px;
