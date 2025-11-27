@@ -197,6 +197,7 @@ const KonvosChatInner: React.FC = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showArchived, setShowArchived] = useState(false);
+    const [showMobileChat, setShowMobileChat] = useState(false);
 
     const filters = {
         type: 'messaging',
@@ -282,7 +283,7 @@ const KonvosChatInner: React.FC = () => {
                     <Channel key={channel.cid}>
                         <Window>
                             <CustomChannelHeader channel={channel} />
-                            <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
+                            <MessageList messageActions={['react', 'delete', 'edit']} />
                             <EmojiInputWrapper>
                                 <MessageInput focus />
                             </EmojiInputWrapper>
@@ -293,43 +294,55 @@ const KonvosChatInner: React.FC = () => {
 
                 {/* Mobile View */}
                 <div className="flex md:hidden flex-col w-full h-full bg-white">
-                {!channel ? (
-                    <div className="flex flex-col">
-                        <CustomChannelListHeader
-                            onSearch={setSearchQuery}
-                            isSearching={isSearching}
-                            setIsSearching={setIsSearching}
-                            onToggleArchived={() => setShowArchived(!showArchived)}
-                            showArchived={showArchived}
-                            onCreateGroup={undefined}
-                            onToggleTheme={undefined}
-                            isDarkMode={false}
-                        />
+                    {!showMobileChat ? (
+                        <div className="flex flex-col h-full">
+                            <CustomChannelListHeader
+                                onSearch={setSearchQuery}
+                                isSearching={isSearching}
+                                setIsSearching={setIsSearching}
+                                onToggleArchived={() => setShowArchived(!showArchived)}
+                                showArchived={showArchived}
+                                onCreateGroup={undefined}
+                                onToggleTheme={undefined}
+                                isDarkMode={false}
+                            />
 
-                        {isSearching ? (
-                            <UserList query={searchQuery} onUserSelect={handleUserSelect} />
-                        ) : (
-                            <div className="flex-1 overflow-y-auto">
-                                <ChannelList
-                                    filters={filters}
-                                    sort={sort}
-                                    Preview={CustomChannelPreview}
-                                />
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <Channel key={channel.cid}>
-                        <Window>
-                            <CustomChannelHeader channel={channel} />
-                            <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
-                            <EmojiInputWrapper>
-                                <MessageInput focus />
-                            </EmojiInputWrapper>
-                        </Window>
-                    </Channel>
-                )}
-            </div>
+                            {isSearching ? (
+                                <UserList query={searchQuery} onUserSelect={handleUserSelect} />
+                            ) : (
+                                <div className="flex-1 overflow-y-auto">
+                                    <ChannelList
+                                        filters={filters}
+                                        sort={sort}
+                                        Preview={CustomChannelPreview}
+                                        onSelect={() => setShowMobileChat(true)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    ) : channel ? (
+                        <Channel key={channel.cid}>
+                            <Window>
+                                <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 h-[60px]">
+                                    <button
+                                        onClick={() => {
+                                            setShowMobileChat(false);
+                                            setActiveChannel(undefined);
+                                        }}
+                                        className="p-2 text-gray-600 hover:bg-gray-200 rounded-full"
+                                    >
+                                        <ArrowLeft size={20} />
+                                    </button>
+                                    <ChannelHeader />
+                                </div>
+                                <MessageList messageActions={['react', 'delete', 'edit']} />
+                                <EmojiInputWrapper>
+                                    <MessageInput focus />
+                                </EmojiInputWrapper>
+                            </Window>
+                        </Channel>
+                    ) : null}
+                </div>
         </div>
     );
 };
