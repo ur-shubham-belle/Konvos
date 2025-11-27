@@ -115,7 +115,8 @@ const CustomChannelHeader: React.FC<any> = (props) => {
 
 const KonvosChatInner: React.FC = () => {
     const { client, setActiveChannel, channel } = useChatContext();
-    const { activeCall } = useAuth();
+    const { activeCall, setActiveCall } = useAuth();
+    const videoClient = useStreamVideoClient();
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showArchived, setShowArchived] = useState(false);
@@ -138,6 +139,28 @@ const KonvosChatInner: React.FC = () => {
         setMobileShowChat(false);
         setIsSearching(false);
         setSearchQuery('');
+    };
+
+    const startMobileCall = async (audioOnly: boolean = false) => {
+        if (!videoClient || !channel) return;
+
+        const members = Object.values(channel.state.members)
+            .map((m: any) => m.user_id)
+            .filter((id: string) => id !== client.userID);
+        if (members.length === 0) return;
+
+        const callId = Math.random().toString(36).substring(7);
+        const call = videoClient.call('default', callId);
+
+        try {
+            await call.join({ create: true });
+            if (audioOnly) {
+                await call.camera.disable();
+            }
+            setActiveCall(call);
+        } catch (e) {
+            console.error('Failed to start call', e);
+        }
     };
 
     const handleUserSelect = async (userId: string) => {
@@ -260,10 +283,28 @@ const KonvosChatInner: React.FC = () => {
                                     >
                                         <ArrowLeft size={20} />
                                     </button>
-                                    <ChannelHeader />
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <ChannelHeader />
+                                    </div>
                                 </div>
                                 <MessageList messageActions={['react', 'delete', 'edit']} />
                                 <MessageInput autoFocus />
+                                <div className="flex items-center gap-2 shrink-0 absolute top-3 right-14">
+                                    <button
+                                        className="p-2 hover:bg-gray-100 rounded-full text-gray-600 transition-colors"
+                                        onClick={() => startMobileCall(false)}
+                                        title="Video call"
+                                    >
+                                        <Video size={20} />
+                                    </button>
+                                    <button
+                                        className="p-2 hover:bg-gray-100 rounded-full text-gray-600 transition-colors"
+                                        onClick={() => startMobileCall(true)}
+                                        title="Voice call"
+                                    >
+                                        <Phone size={20} />
+                                    </button>
+                                </div>
                             </Window>
                         </Channel>
                     )
