@@ -8,7 +8,6 @@ import {
     MessageList,
     MessageInput,
     useChatContext,
-    Message,
 } from 'stream-chat-react';
 import { useStreamVideoClient } from '@stream-io/video-react-sdk';
 import { StreamCall } from '@stream-io/video-react-sdk';
@@ -59,41 +58,7 @@ const EmojiPicker: React.FC<{ onSelect: (emoji: string) => void; onClose: () => 
     );
 };
 
-const ReplyBar: React.FC<{ message: any; onClear: () => void }> = ({ message, onClear }) => {
-    const text = message?.text || '';
-    const senderName = message?.user?.name || 'User';
-    
-    return (
-        <div className="bg-gray-50 border-l-4 border-green-500 px-4 py-3 flex items-center justify-between">
-            <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 mb-1">Replying to {senderName}</p>
-                <p className="text-sm text-gray-700 truncate">{text}</p>
-            </div>
-            <button
-                onClick={onClear}
-                className="ml-4 p-1 text-gray-500 hover:text-gray-700 flex-shrink-0"
-            >
-                ✕
-            </button>
-        </div>
-    );
-};
 
-const CustomMessage: React.FC<any> = (props) => {
-    const { onReply } = props;
-    
-    return (
-        <Message 
-            {...props}
-            actions={props.messageActions}
-            onReplyAction={() => {
-                if (onReply) {
-                    onReply(props.message);
-                }
-            }}
-        />
-    );
-};
 
 const EmojiInputWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [showEmoji, setShowEmoji] = useState(false);
@@ -232,7 +197,6 @@ const KonvosChatInner: React.FC = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showArchived, setShowArchived] = useState(false);
-    const [repliedTo, setRepliedTo] = useState<any>(null);
 
     const filters = {
         type: 'messaging',
@@ -266,14 +230,6 @@ const KonvosChatInner: React.FC = () => {
                 console.error('Fallback failed:', fallbackError);
             }
         }
-    };
-
-    const handleReply = (message: any) => {
-        setRepliedTo(message);
-    };
-
-    const clearReply = () => {
-        setRepliedTo(null);
     };
 
     return (
@@ -326,11 +282,7 @@ const KonvosChatInner: React.FC = () => {
                     <Channel key={channel.cid}>
                         <Window>
                             <CustomChannelHeader channel={channel} />
-                            <MessageList 
-                                messageActions={['react', 'reply', 'delete', 'edit']}
-                                Message={(msg) => <CustomMessage {...msg} onReply={handleReply} />}
-                            />
-                            {repliedTo && <ReplyBar message={repliedTo} onClear={clearReply} />}
+                            <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
                             <EmojiInputWrapper>
                                 <MessageInput focus />
                             </EmojiInputWrapper>
@@ -370,11 +322,7 @@ const KonvosChatInner: React.FC = () => {
                     <Channel key={channel.cid}>
                         <Window>
                             <CustomChannelHeader channel={channel} />
-                            <MessageList 
-                                messageActions={['react', 'reply', 'delete', 'edit']}
-                                Message={(msg) => <CustomMessage {...msg} onReply={handleReply} />}
-                            />
-                            {repliedTo && <ReplyBar message={repliedTo} onClear={clearReply} />}
+                            <MessageList messageActions={['react', 'reply', 'delete', 'edit']} />
                             <EmojiInputWrapper>
                                 <MessageInput focus />
                             </EmojiInputWrapper>
